@@ -8,10 +8,11 @@ import { createClient } from "@/lib/supabase/server";
 import { SUBJECT_COLORS, SUBJECT_ICON_OPTIONS } from "@/lib/subjects/constants";
 import { toDbError } from "@/lib/db/schema-error";
 
-function revalidateTracking() {
+function revalidateSubjects() {
   revalidatePath("/");
   revalidatePath("/tracker");
   revalidatePath("/subjects");
+  revalidatePath("/todos");
 }
 
 export async function getSubjectsAction() {
@@ -64,7 +65,7 @@ export async function createSubjectAction(input: {
     throw toDbError(error);
   }
 
-  revalidateTracking();
+  revalidateSubjects();
   return data;
 }
 
@@ -107,7 +108,7 @@ export async function updateSubjectAction(
     throw toDbError(error);
   }
 
-  revalidateTracking();
+  revalidateSubjects();
   return data;
 }
 
@@ -120,15 +121,20 @@ export async function deleteSubjectAction(subjectId: string) {
   }
 
   const supabase = await createClient();
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("subjects")
     .delete()
     .eq("id", subjectId)
-    .eq("user_id", user.id);
+    .eq("user_id", user.id)
+    .select("id");
 
   if (error) {
     throw toDbError(error);
   }
 
-  revalidateTracking();
+  if (!data?.length) {
+    throw new Error("Subject could not be deleted");
+  }
+
+  revalidateSubjects();
 }

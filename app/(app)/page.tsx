@@ -1,34 +1,23 @@
-import {
-  PLACEHOLDER_STATS,
-  StatCard,
-} from "@/components/dashboard/stat-cards";
-import { WeeklyChart } from "@/components/dashboard/weekly-chart";
-import { RecentSessions } from "@/components/dashboard/recent-sessions";
-import { SubjectCards } from "@/components/dashboard/subject-cards";
-import { TodoTable } from "@/components/dashboard/todo-table";
+import { SchemaSetupRequired } from "@/components/setup/schema-setup-required";
+import { DashboardView } from "@/components/dashboard/dashboard-view";
+import { requireUser } from "@/lib/auth/require-user";
+import { SchemaNotReadyError } from "@/lib/db/schema-error";
+import { getDashboardData } from "@/lib/data/dashboard";
 
-export default function DashboardPage() {
-  return (
-    <div className="mx-auto max-w-[1200px] space-y-8">
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {PLACEHOLDER_STATS.map((stat) => (
-          <StatCard key={stat.label} {...stat} />
-        ))}
+export default async function DashboardPage() {
+  try {
+    const user = await requireUser();
+    const data = await getDashboardData(user.id);
+
+    return (
+      <div className="mx-auto max-w-[1200px]">
+        <DashboardView data={data} />
       </div>
-
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <WeeklyChart />
-        </div>
-        <RecentSessions />
-      </div>
-
-      <div>
-        <h2 className="mb-4 text-base font-semibold">Subjects</h2>
-        <SubjectCards />
-      </div>
-
-      <TodoTable />
-    </div>
-  );
+    );
+  } catch (error) {
+    if (error instanceof SchemaNotReadyError) {
+      return <SchemaSetupRequired />;
+    }
+    throw error;
+  }
 }

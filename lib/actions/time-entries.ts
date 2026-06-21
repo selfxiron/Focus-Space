@@ -3,11 +3,10 @@
 import { revalidatePath } from "next/cache";
 
 import { requireUser } from "@/lib/auth/require-user";
-import { getSubjectById, listSubjects } from "@/lib/data/subjects";
+import { getSubjectById } from "@/lib/data/subjects";
 import {
   getActiveTimeEntry,
   getTimeEntryById,
-  listRecentTimeEntries,
 } from "@/lib/data/time-entries";
 import { createClient } from "@/lib/supabase/server";
 import { toDbError } from "@/lib/db/schema-error";
@@ -16,18 +15,7 @@ import { durationMinutesBetween } from "@/lib/time/duration";
 function revalidateTracking() {
   revalidatePath("/");
   revalidatePath("/tracker");
-}
-
-export async function getTrackerDataAction() {
-  const user = await requireUser();
-
-  const [subjects, entries, activeEntry] = await Promise.all([
-    listSubjects(user.id),
-    listRecentTimeEntries(user.id),
-    getActiveTimeEntry(user.id),
-  ]);
-
-  return { subjects, entries, activeEntry };
+  revalidatePath("/subjects");
 }
 
 export async function startTimerAction(subjectId: string) {
@@ -46,6 +34,22 @@ export async function startTimerAction(subjectId: string) {
   }
 
   const supabase = await createClient();
+
+  // Re-check after async work to reduce double-start races
+  const { data: stillActive } = await supabase
+    .from("time_entries")
+    .select("id")
+    .eq("user_id", user.id)
+    .is("end_time", null)
+    .limit(1)
+    .maybeSingle();
+
+  if (stillActive) {
+    throw new Error(
+      "A timer is already running. Stop it before starting another."
+    );
+  }
+
   const { data, error } = await supabase
     .from("time_entries")
     .insert({
@@ -94,6 +98,10 @@ export async function stopTimerAction(entryId: string) {
 
   if (error) {
     throw toDbError(error);
+  }
+
+  if (!data) {
+    throw new Error("Session could not be stopped");
   }
 
   revalidateTracking();

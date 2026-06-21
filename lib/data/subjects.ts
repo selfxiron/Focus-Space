@@ -39,7 +39,8 @@ export async function ensureDefaultSubjects(userId: string) {
 
   const { count, error: countError } = await supabase
     .from("subjects")
-    .select("*", { count: "exact", head: true });
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", userId);
 
   if (countError) {
     throw toDbError(countError);
@@ -87,16 +88,12 @@ export async function getSubjectById(userId: string, subjectId: string) {
     .from("subjects")
     .select("*")
     .eq("id", subjectId)
+    .eq("user_id", userId)
     .single();
 
   if (error || !data) {
     return null;
   }
 
-  const row = data as SubjectDbRow;
-  if (row.user_id !== userId) {
-    return null;
-  }
-
-  return mapSubject(row);
+  return mapSubject(data as SubjectDbRow);
 }

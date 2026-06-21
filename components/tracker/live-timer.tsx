@@ -17,6 +17,7 @@ import {
 } from "@/lib/actions/time-entries";
 import type { SubjectRow } from "@/lib/data/subjects";
 import { getSubjectIcon } from "@/lib/subjects/constants";
+import { notifySessionLogged } from "@/lib/tracker/session-events";
 import { cn } from "@/lib/utils";
 
 interface LiveTimerProps {
@@ -35,15 +36,17 @@ export function LiveTimer({ subjects }: LiveTimerProps) {
   const [selectedSubjectId, setSelectedSubjectId] = useState(
     subjects[0]?.id ?? ""
   );
+  const [starting, setStarting] = useState(false);
   const [stopping, setStopping] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const pendingStartRef = useRef<Promise<string> | null>(null);
 
   function handleStart() {
     const subject = subjects.find((s) => s.id === selectedSubjectId);
-    if (!subject) return;
+    if (!subject || starting || pendingStartRef.current) return;
 
     setError(null);
+    setStarting(true);
     beginActiveTimer({
       id: subject.id,
       name: subject.name,
@@ -66,6 +69,7 @@ export function LiveTimer({ subjects }: LiveTimerProps) {
           subjectColor: subject.color,
           subjectIcon: subject.icon,
         });
+        router.refresh();
         return data.id;
       })
       .catch((err) => {
@@ -78,7 +82,7 @@ export function LiveTimer({ subjects }: LiveTimerProps) {
 
     pendingStartRef.current.finally(() => {
       pendingStartRef.current = null;
-      router.refresh();
+      setStarting(false);
     });
   }
 
@@ -99,8 +103,9 @@ export function LiveTimer({ subjects }: LiveTimerProps) {
         entryId = await pending;
       }
 
-      clearActiveTimer();
       await stopTimerAction(entryId);
+      clearActiveTimer();
+      notifySessionLogged();
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to stop timer");
@@ -182,10 +187,10 @@ export function LiveTimer({ subjects }: LiveTimerProps) {
             <Button
               className="w-full gap-2"
               onClick={handleStart}
-              disabled={!selectedSubjectId}
+              disabled={!selectedSubjectId || starting}
             >
               <Play className="h-4 w-4" />
-              Start timer
+              {starting ? "Starting…" : "Start timer"}
             </Button>
           </div>
         )}

@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 
 import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar";
+import { PomodoroWidget } from "@/components/pomodoro/pomodoro-widget";
 import { TimerProvider } from "@/components/tracker/timer-provider";
 import type { TimeEntryWithSubject } from "@/lib/data/time-entries";
 
@@ -30,6 +31,7 @@ export function AppShell({
           <Header userEmail={userEmail} userName={userName} />
           <main className="flex-1 overflow-y-auto p-6 lg:p-8">{children}</main>
         </div>
+        <PomodoroWidget />
       </div>
     </TimerProvider>
   );

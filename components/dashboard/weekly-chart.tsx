@@ -13,31 +13,16 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { DashboardChartDay } from "@/lib/data/dashboard";
 
-const WEEKLY_DATA = [
-  { day: "Mon", hours: 2.5 },
-  { day: "Tue", hours: 3.8 },
-  { day: "Wed", hours: 1.2 },
-  { day: "Thu", hours: 4.1 },
-  { day: "Fri", hours: 2.9 },
-  { day: "Sat", hours: 5.2 },
-  { day: "Sun", hours: 3.4 },
-];
+interface WeeklyChartProps {
+  chart7d: DashboardChartDay[];
+  chart14d: DashboardChartDay[];
+}
 
-const EXTENDED_DATA = [
-  ...WEEKLY_DATA,
-  { day: "Mon", hours: 2.1 },
-  { day: "Tue", hours: 3.0 },
-  { day: "Wed", hours: 4.5 },
-  { day: "Thu", hours: 2.8 },
-  { day: "Fri", hours: 3.6 },
-  { day: "Sat", hours: 1.9 },
-  { day: "Sun", hours: 4.0 },
-];
-
-export function WeeklyChart() {
+export function WeeklyChart({ chart7d, chart14d }: WeeklyChartProps) {
   const [range, setRange] = useState<"7d" | "14d">("7d");
-  const data = range === "7d" ? WEEKLY_DATA : EXTENDED_DATA;
+  const data = range === "7d" ? chart7d : chart14d;
 
   return (
     <Card className="border-border/60 shadow-[var(--shadow-soft)]">
@@ -68,42 +53,54 @@ export function WeeklyChart() {
         </div>
       </CardHeader>
       <CardContent className="h-[280px] pt-0">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
-            <CartesianGrid
-              strokeDasharray="3 3"
-              vertical={false}
-              stroke="var(--border)"
-            />
-            <XAxis
-              dataKey="day"
-              axisLine={false}
-              tickLine={false}
-              tick={{ fill: "var(--muted)", fontSize: 12 }}
-            />
-            <YAxis
-              axisLine={false}
-              tickLine={false}
-              tick={{ fill: "var(--muted)", fontSize: 12 }}
-              tickFormatter={(v) => `${v}h`}
-            />
-            <Tooltip
-              cursor={{ fill: "rgba(45, 212, 191, 0.08)" }}
-              contentStyle={{
-                borderRadius: "12px",
-                border: "1px solid var(--border)",
-                boxShadow: "var(--shadow-card)",
-              }}
-              formatter={(value: number) => [`${value}h`, "Study"]}
-            />
-            <Bar
-              dataKey="hours"
-              fill="var(--brand-dark)"
-              radius={[8, 8, 0, 0]}
-              maxBarSize={48}
-            />
-          </BarChart>
-        </ResponsiveContainer>
+        {data.every((d) => d.hours === 0) ? (
+          <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+            No study time in this period yet
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={data}
+              margin={{ top: 8, right: 8, left: -16, bottom: 0 }}
+            >
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={false}
+                stroke="var(--border)"
+              />
+              <XAxis
+                dataKey="day"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: "var(--muted)", fontSize: 12 }}
+              />
+              <YAxis
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: "var(--muted)", fontSize: 12 }}
+                tickFormatter={(v) => `${v}h`}
+              />
+              <Tooltip
+                cursor={{ fill: "rgba(45, 212, 191, 0.08)" }}
+                contentStyle={{
+                  borderRadius: "12px",
+                  border: "1px solid var(--border)",
+                  boxShadow: "var(--shadow-card)",
+                }}
+                labelFormatter={(_, payload) =>
+                  payload?.[0]?.payload?.label ?? ""
+                }
+                formatter={(value: number) => [`${value}h`, "Study"]}
+              />
+              <Bar
+                dataKey="hours"
+                fill="var(--brand-dark)"
+                radius={[8, 8, 0, 0]}
+                maxBarSize={48}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        )}
       </CardContent>
     </Card>
   );

@@ -12,7 +12,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:setup": "node scripts/setup-db.mjs",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "validate:schema": "node scripts/validate-schema.mjs"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.3",

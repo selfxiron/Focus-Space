@@ -33,29 +33,3 @@ export function StatCard({ label, value, subtitle, pastel }: StatCardProps) {
   );
 }
 
-export const PLACEHOLDER_STATS = [
-  {
-    label: "Total Study Hours",
-    value: "42.5h",
-    subtitle: "+3.2h this week",
-    pastel: "peach" as const,
-  },
-  {
-    label: "Daily Goal",
-    value: "68%",
-    subtitle: "2.7h of 4h target",
-    pastel: "mint" as const,
-  },
-  {
-    label: "Tasks Done",
-    value: "12",
-    subtitle: "4 remaining",
-    pastel: "lavender" as const,
-  },
-  {
-    label: "Current Streak",
-    value: "7 days",
-    subtitle: "Best: 9 days",
-    pastel: "sky" as const,
-  },
-];

@@ -9,6 +9,16 @@ export function elapsedBetween(start: Date, end: Date) {
   return { seconds, minutes };
 }
 
+/** Seconds elapsed between start/end, counting only time on or after `since`. */
+export function elapsedSecondsInPeriod(since: Date, start: Date, end: Date) {
+  const effectiveStart =
+    start.getTime() < since.getTime() ? since : start;
+  if (end.getTime() <= effectiveStart.getTime()) {
+    return 0;
+  }
+  return elapsedBetween(effectiveStart, end).seconds;
+}
+
 export function durationMinutesBetween(start: Date, end: Date): number {
   return elapsedBetween(start, end).minutes;
 }

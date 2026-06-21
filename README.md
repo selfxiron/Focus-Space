@@ -1,6 +1,21 @@
 # Focus Space
 
-Self-hosted study tracker. Each account is isolated (single-user, multi-tenant via Supabase Auth + RLS). Tracks study hours, tasks, notes, goals, and Pomodoro sessions.
+Self-hosted study tracker. Each account is isolated (single-user, multi-tenant via Supabase Auth + RLS). Track study hours, tasks, goals, and Pomodoro sessions from one dashboard.
+
+## Features
+
+| Area | Status |
+|------|--------|
+| **Auth** | Email/password sign up and sign in |
+| **Dashboard** | Live stats, weekly chart, recent sessions, subject hours, tasks preview |
+| **Tracker** | Live timer, manual entries, session log with delete |
+| **Todos** | Kanban + table, filters, priority, due dates |
+| **Subjects** | CRUD, default subjects on first visit, weekly/monthly goals with progress rings |
+| **Pomodoro** | Floating widget; logs accurate duration to session log |
+| **Notes** | Planned (placeholder page) |
+| **Settings** | Sign out |
+
+On first load, three default subjects are seeded automatically: Study, Coursework, Projects.
 
 ## Requirements
 
@@ -8,37 +23,57 @@ Self-hosted study tracker. Each account is isolated (single-user, multi-tenant v
 - npm
 - A [Supabase](https://supabase.com) project (free tier works)
 
-## Quick start (local)
+## Quick start
 
 ```bash
+git clone https://github.com/selfxiron/Focus-Space.git
+cd Focus-Space
 npm install
 cp .env.example .env.local   # fill in values — see below
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000), create an account, then run the database migration (below).
 
 ## Environment
 
 Copy `.env.example` to `.env.local`:
 
-| Variable | Source |
-|----------|--------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Project Settings → API → **Project URL** (`https://<ref>.supabase.co`). Not the dashboard browser URL. |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Project Settings → API Keys → **Publishable** key (`sb_publishable_...`) or legacy **anon** key |
-| `DATABASE_URL` | Optional for `npm run db:push` only — Connect → transaction pooler, port **6543** |
+| Variable | Required | Source |
+|----------|----------|--------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Project Settings → API → **Project URL** (`https://<ref>.supabase.co`). Not the dashboard browser URL. |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | API Keys → **Publishable** key (`sb_publishable_...`) or legacy **anon** key |
+| `DATABASE_HOST` | For `db:setup` | Connect → Transaction pooler host |
+| `DATABASE_PORT` | For `db:setup` | Usually `6543` (pooler) |
+| `DATABASE_USER` | For `db:setup` | `postgres.<project-ref>` |
+| `DATABASE_PASSWORD` | For `db:setup` | Database password (quotes if special chars) |
+| `DATABASE_NAME` | For `db:setup` | `postgres` |
+
+Alternatively, set `DATABASE_URL` instead of the discrete `DATABASE_*` vars.
+
+**Never** commit `.env.local` or expose the service_role key or database password in client code.
 
 ## Database
 
-Run `supabase/migrations/0000_initial.sql` in the Supabase SQL Editor (schema + RLS).
+Run the full migration in the Supabase SQL Editor (schema, RLS, indexes):
 
-Alternatively, with `DATABASE_URL` set:
-
-```bash
-npm run db:push
+```text
+supabase/migrations/0000_initial.sql
 ```
 
-`db:push` syncs the Drizzle schema but does not apply RLS policies. Run the SQL migration for RLS.
+Or, with database env vars set:
+
+```bash
+npm run db:setup
+```
+
+Validate tables and RLS locally:
+
+```bash
+npm run validate:schema
+```
+
+`npm run db:push` syncs the Drizzle schema to Postgres but **does not** apply RLS policies — always run the SQL migration for a fresh project.
 
 ## Auth redirects
 
@@ -53,9 +88,10 @@ Supabase → Authentication → URL configuration:
 
 1. Push this repo to GitHub.
 2. Import the project in [Vercel](https://vercel.com/new).
-3. Add the three environment variables from `.env.example` (Production + Preview).
+3. Add `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` (Production + Preview).
 4. Deploy.
 5. Add your Vercel URL to Supabase auth redirects (see above).
+6. Run `0000_initial.sql` on your Supabase project if not already done.
 
 No extra build config required — Next.js is detected automatically.
 
@@ -67,21 +103,30 @@ No extra build config required — Next.js is detected automatically.
 | `npm run build` | Production build |
 | `npm run start` | Run production build |
 | `npm run lint` | ESLint |
-| `npm run db:push` | Push Drizzle schema to Postgres |
+| `npm run validate:schema` | Check migration defines all tables + RLS |
+| `npm run db:setup` | Apply migration via `scripts/setup-db.mjs` |
+| `npm run db:push` | Push Drizzle schema (no RLS) |
+| `npm run db:generate` | Generate Drizzle migration files |
+| `npm run db:migrate` | Run Drizzle migrations |
 | `npm run db:studio` | Drizzle Studio |
 
-## Structure
+## Project structure
 
-```
+```text
 app/
-  (auth)/          login, signup
+  (auth)/login, signup
   (app)/           dashboard, tracker, todos, notes, subjects, settings
-  auth/callback/   auth callback handler
-components/        UI, dashboard widgets, layout
-lib/supabase/      Auth clients and middleware helpers
-lib/db/            Drizzle schema and client
-supabase/migrations/   SQL migrations
+  auth/callback/   OAuth / email confirmation handler
+components/        UI, dashboard, tracker, todos, goals, pomodoro, layout
+lib/
+  actions/         Server actions (mutations)
+  data/            Supabase read helpers (RLS-scoped)
+  supabase/        Auth clients and middleware
+  db/              Drizzle schema (migrations tooling)
+supabase/migrations/   SQL migrations + RLS
 ```
+
+Runtime data access uses the **Supabase JS client** with the user session (RLS enforced). Drizzle is used for schema management and optional `db:push` / `db:studio`.
 
 ## Stack
 
@@ -91,10 +136,10 @@ Design tokens: `lib/design-tokens.css`.
 
 ## Security
 
-- Never commit `.env.local` or secrets.
 - Use the publishable/anon key in client code only.
-- Never expose secret/service_role keys or `DATABASE_URL` to the browser.
-- Server-side Drizzle queries must filter by `user_id`; the Postgres connection bypasses RLS.
+- All tables use Row Level Security (`user_id = auth.uid()`).
+- Auth callback redirects are sanitized to same-origin paths only.
+- Server actions validate ownership before mutations.
 
 ## License
 

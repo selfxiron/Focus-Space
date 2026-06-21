@@ -141,3 +141,8 @@ CREATE POLICY "pomodoro_delete" ON pomodoro_sessions FOR DELETE USING (auth.uid(
 
 -- Refresh PostgREST schema cache so Supabase API sees new tables
 NOTIFY pgrst, 'reload schema';
+
+-- One active (open) time entry per user
+CREATE UNIQUE INDEX IF NOT EXISTS time_entries_one_active_per_user
+  ON time_entries (user_id)
+  WHERE end_time IS NULL;

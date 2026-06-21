@@ -9,7 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { deleteTimeEntryAction } from "@/lib/actions/time-entries";
 import type { TimeEntryWithSubject } from "@/lib/data/time-entries";
 import { formatSessionDuration } from "@/lib/time/duration";
-import { formatDateTime, formatTimeAgo } from "@/lib/utils";
+import { SESSION_LOGGED_EVENT } from "@/lib/tracker/session-events";
+import { SessionWhen } from "@/components/tracker/session-when";
 
 interface SessionLogProps {
   entries: TimeEntryWithSubject[];
@@ -42,6 +43,16 @@ export function SessionLog({ entries }: SessionLogProps) {
     }
   }, [entries]);
 
+  useEffect(() => {
+    function onSessionLogged() {
+      router.refresh();
+    }
+
+    window.addEventListener(SESSION_LOGGED_EVENT, onSessionLogged);
+    return () =>
+      window.removeEventListener(SESSION_LOGGED_EVENT, onSessionLogged);
+  }, [router]);
+
   async function handleDelete(entryId: string) {
     setError(null);
     pendingDeletesRef.current.add(entryId);
@@ -73,7 +84,7 @@ export function SessionLog({ entries }: SessionLogProps) {
         {error && <p className="mb-4 text-sm text-destructive">{error}</p>}
         {localEntries.length === 0 ? (
           <p className="py-8 text-center text-sm text-muted-foreground">
-            No sessions yet. Start the timer or add a manual entry.
+            No sessions yet. Start the timer, use Pomodoro, or add a manual entry.
           </p>
         ) : (
           <div className="overflow-hidden rounded-[14px] border border-border/60">
@@ -97,15 +108,11 @@ export function SessionLog({ entries }: SessionLogProps) {
               </thead>
               <tbody>
                 {localEntries.map((entry) => {
-                  const isActive = !entry.endTime;
                   const duration = formatSessionDuration(
                     new Date(entry.startTime),
                     entry.endTime ? new Date(entry.endTime) : null,
                     entry.durationMinutes
                   );
-                  const when = isActive
-                    ? `Started ${formatTimeAgo(new Date(entry.startTime))}`
-                    : formatDateTime(new Date(entry.endTime!));
 
                   return (
                     <tr
@@ -126,14 +133,14 @@ export function SessionLog({ entries }: SessionLogProps) {
                       <td className="px-4 py-3 text-brand-dark font-medium">
                         {duration}
                       </td>
-                      <td className="px-4 py-3 text-muted-foreground">
-                        {when}
+                      <td className="px-4 py-3">
+                        <SessionWhen entry={entry} />
                       </td>
                       <td className="px-4 py-3 text-muted-foreground max-w-[200px] truncate">
                         {entry.note ?? "—"}
                       </td>
                       <td className="px-4 py-3">
-                        {!isActive && (
+                        {!entry.endTime ? null : (
                           <Button
                             type="button"
                             variant="ghost"

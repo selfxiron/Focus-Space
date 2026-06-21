@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { createManualEntryAction } from "@/lib/actions/time-entries";
 import type { SubjectRow } from "@/lib/data/subjects";
+import { notifySessionLogged } from "@/lib/tracker/session-events";
 
 interface ManualEntryFormProps {
   subjects: SubjectRow[];
@@ -17,16 +18,23 @@ interface ManualEntryFormProps {
 
 export function ManualEntryForm({ subjects }: ManualEntryFormProps) {
   const router = useRouter();
-  const now = new Date();
-  const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
-
   const [subjectId, setSubjectId] = useState(subjects[0]?.id ?? "");
-  const [startTime, setStartTime] = useState(toLocalInput(oneHourAgo));
-  const [endTime, setEndTime] = useState(toLocalInput(now));
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
   const [note, setNote] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
+
+  function openForm() {
+    const now = new Date();
+    const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+    setStartTime(toLocalInput(oneHourAgo));
+    setEndTime(toLocalInput(now));
+    setSubjectId(subjects[0]?.id ?? "");
+    setError(null);
+    setOpen(true);
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -41,6 +49,7 @@ export function ManualEntryForm({ subjects }: ManualEntryFormProps) {
       });
       setNote("");
       setOpen(false);
+      notifySessionLogged();
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to add entry");
@@ -51,7 +60,7 @@ export function ManualEntryForm({ subjects }: ManualEntryFormProps) {
 
   if (!open) {
     return (
-      <Button variant="outline" onClick={() => setOpen(true)}>
+      <Button variant="outline" onClick={openForm}>
         Add manual entry
       </Button>
     );

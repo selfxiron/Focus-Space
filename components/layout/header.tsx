@@ -1,10 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Plus, Search } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { ActiveTimerBadge } from "@/components/tracker/active-timer-badge";
 
 const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
@@ -22,15 +21,15 @@ const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
   },
   "/notes": {
     title: "Notes",
-    subtitle: "Markdown notes per subject",
+    subtitle: "Coming soon — markdown notes per subject",
   },
   "/subjects": {
     title: "Subjects",
-    subtitle: "Subjects and goals",
+    subtitle: "Subjects and study goals",
   },
   "/settings": {
     title: "Settings",
-    subtitle: "Account and preferences",
+    subtitle: "Account and sign out",
   },
 };
 
@@ -53,22 +52,12 @@ export function Header({ userEmail, userName }: HeaderProps) {
       </div>
 
       <div className="flex items-center gap-3">
-        <Button variant="outline" size="sm" className="hidden sm:flex gap-2">
-          <Search className="h-4 w-4" />
-          <span className="text-muted-foreground">Search</span>
-          <kbd className="ml-2 rounded-md bg-secondary px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
-            ⌘K
-          </kbd>
-        </Button>
-
-        <Button variant="outline" size="sm" className="gap-2">
-          <Plus className="h-4 w-4" />
-          Quick add
-        </Button>
-
         <ActiveTimerBadge />
 
-        <div className="flex items-center gap-2 pl-2">
+        <Link
+          href="/settings"
+          className="flex items-center gap-2 pl-2 rounded-[12px] transition-colors hover:bg-secondary/60"
+        >
           <Avatar className="h-9 w-9">
             <AvatarFallback>{initials}</AvatarFallback>
           </Avatar>
@@ -78,7 +67,7 @@ export function Header({ userEmail, userName }: HeaderProps) {
               <p className="text-xs text-muted-foreground">{userEmail}</p>
             )}
           </div>
-        </div>
+        </Link>
       </div>
     </header>
   );
