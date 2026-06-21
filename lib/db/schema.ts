@@ -116,6 +116,13 @@ export const subjectsRelations = relations(subjects, ({ many }) => ({
   pomodoroSessions: many(pomodoroSessions),
 }));
 
+export const timeEntriesRelations = relations(timeEntries, ({ one }) => ({
+  subject: one(subjects, {
+    fields: [timeEntries.subjectId],
+    references: [subjects.id],
+  }),
+}));
+
 export const DEFAULT_SUBJECTS = [
   { name: "Study", color: "#14B8A6", icon: "book", sortOrder: 0 },
   { name: "Coursework", color: "#8B5CF6", icon: "calculator", sortOrder: 1 },

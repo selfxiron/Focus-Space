@@ -1,10 +1,18 @@
+/**
+ * Drizzle client for CLI tools only (`npm run db:push`, `db:studio`).
+ * Runtime data access uses the Supabase client (lib/data/*) so the app
+ * does not require a direct Postgres password at runtime.
+ */
 import { drizzle } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
 
+import { createPostgresClient } from "@/lib/db/config";
 import * as schema from "./schema";
 
-const connectionString = process.env.DATABASE_URL!;
+let _db: ReturnType<typeof drizzle<typeof schema>> | null = null;
 
-const client = postgres(connectionString, { prepare: false });
-
-export const db = drizzle(client, { schema });
+export function getDb() {
+  if (!_db) {
+    _db = drizzle(createPostgresClient(), { schema });
+  }
+  return _db;
+}

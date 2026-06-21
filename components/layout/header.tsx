@@ -1,11 +1,11 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { Plus, Search, Timer } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { ActiveTimerBadge } from "@/components/tracker/active-timer-badge";
 
 const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
   "/": {
@@ -66,10 +66,7 @@ export function Header({ userEmail, userName }: HeaderProps) {
           Quick add
         </Button>
 
-        <Badge variant="info" className="gap-1.5 px-3 py-1.5">
-          <Timer className="h-3 w-3" />
-          No active timer
-        </Badge>
+        <ActiveTimerBadge />
 
         <div className="flex items-center gap-2 pl-2">
           <Avatar className="h-9 w-9">

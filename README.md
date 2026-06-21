@@ -26,7 +26,7 @@ Copy `.env.example` to `.env.local`:
 |----------|--------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Project Settings → API → **Project URL** (`https://<ref>.supabase.co`). Not the dashboard browser URL. |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Project Settings → API Keys → **Publishable** key (`sb_publishable_...`) or legacy **anon** key |
-| `DATABASE_URL` | Project dashboard → **Connect** → Transaction pooler, port **6543** |
+| `DATABASE_URL` | Optional for `npm run db:push` only — Connect → transaction pooler, port **6543** |
 
 ## Database
 
