@@ -13,7 +13,7 @@ import { useUserSettings } from "@/components/settings/settings-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { NativeSelect } from "@/components/ui/native-select";
+import { FilterSelect } from "@/components/ui/filter-select";
 import { completePomodoroWorkAction } from "@/lib/actions/pomodoro";
 import type { SubjectRow } from "@/lib/data/subjects";
 import { notifySessionLogged } from "@/lib/tracker/session-events";
@@ -289,17 +289,17 @@ export function PomodoroWidget({ subjects: initialSubjects }: { subjects: Subjec
               >
                 <div className="space-y-2">
                   <Label htmlFor="pomodoro-subject" className="fs-label">Subject</Label>
-                  <NativeSelect
+                  <FilterSelect
                     id="pomodoro-subject"
                     value={subjectId}
-                    onChange={(e) => setSubjectId(e.target.value)}
+                    onValueChange={setSubjectId}
                     disabled={subjects.length === 0}
-                    className="disabled:opacity-60"
-                  >
-                    {subjects.map((s) => (
-                      <option key={s.id} value={s.id}>{s.name}</option>
-                    ))}
-                  </NativeSelect>
+                    options={subjects.map((s) => ({
+                      value: s.id,
+                      label: s.name,
+                    }))}
+                    fullWidth
+                  />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-2">

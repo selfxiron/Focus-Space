@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { NativeSelect } from "@/components/ui/native-select";
+import { FilterSelect } from "@/components/ui/filter-select";
 import { updateUserSettingsAction } from "@/lib/actions/user-settings";
 import {
   TIMEZONE_OPTIONS,
@@ -69,15 +69,16 @@ export function PreferencesForm({ initialSettings }: PreferencesFormProps) {
       <CardContent className="space-y-5">
         <div className="space-y-2">
           <Label htmlFor="settings-timezone" className="fs-label">Timezone</Label>
-          <NativeSelect
+          <FilterSelect
             id="settings-timezone"
             value={timezone}
-            onChange={(e) => setTimezone(e.target.value)}
-          >
-            {TIMEZONE_OPTIONS.map((zone) => (
-              <option key={zone} value={zone}>{zone}</option>
-            ))}
-          </NativeSelect>
+            onValueChange={setTimezone}
+            options={TIMEZONE_OPTIONS.map((zone) => ({
+              value: zone,
+              label: zone,
+            }))}
+            fullWidth
+          />
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">

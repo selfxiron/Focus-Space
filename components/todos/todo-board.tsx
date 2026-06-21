@@ -9,6 +9,7 @@ import { TodoKanban } from "@/components/todos/todo-kanban";
 import { TodoTableView } from "@/components/todos/todo-table-view";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { FilterSelect } from "@/components/ui/filter-select";
 import type { SubjectRow } from "@/lib/data/subjects";
 import type { TodoWithSubject } from "@/lib/data/todos";
 import {
@@ -52,14 +53,38 @@ export function TodoBoard({ todos, subjects }: TodoBoardProps) {
     });
   }, [todos, statusFilter, priorityFilter, subjectFilter]);
 
+  const hasActiveFilters =
+    statusFilter !== "all" ||
+    priorityFilter !== "all" ||
+    subjectFilter !== "all";
+
   function refresh() {
     router.refresh();
   }
 
+  function clearFilters() {
+    setStatusFilter("all");
+    setPriorityFilter("all");
+    setSubjectFilter("all");
+  }
+
+  const statusOptions = [
+    { value: "all", label: "All statuses" },
+    ...TODO_STATUSES.map((s) => ({ value: s, label: STATUS_LABELS[s] })),
+  ];
+  const priorityOptions = [
+    { value: "all", label: "All priorities" },
+    ...TODO_PRIORITIES.map((p) => ({ value: p, label: PRIORITY_LABELS[p] })),
+  ];
+  const subjectOptions = [
+    { value: "all", label: "All subjects" },
+    ...subjects.map((s) => ({ value: s.id, label: s.name })),
+  ];
+
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex flex-wrap items-center gap-2">
+      <div className="space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex rounded-[12px] border border-border/60 p-1">
             <button
               type="button"
@@ -67,7 +92,7 @@ export function TodoBoard({ todos, subjects }: TodoBoardProps) {
               className={cn(
                 "flex items-center gap-1.5 rounded-[8px] px-3 py-1.5 text-sm font-medium transition-colors",
                 view === "kanban"
-                  ? "bg-brand-muted text-brand-dark"
+                  ? "bg-brand-muted text-brand"
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
@@ -80,7 +105,7 @@ export function TodoBoard({ todos, subjects }: TodoBoardProps) {
               className={cn(
                 "flex items-center gap-1.5 rounded-[8px] px-3 py-1.5 text-sm font-medium transition-colors",
                 view === "table"
-                  ? "bg-brand-muted text-brand-dark"
+                  ? "bg-brand-muted text-brand"
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
@@ -88,45 +113,46 @@ export function TodoBoard({ todos, subjects }: TodoBoardProps) {
               Table
             </button>
           </div>
-          <select
-            value={statusFilter}
-            onChange={(e) =>
-              setStatusFilter(e.target.value as TodoStatus | "all")
-            }
-            className="fs-field h-9"
-          >
-            <option value="all">All statuses</option>
-            {TODO_STATUSES.map((s) => (
-              <option key={s} value={s}>{STATUS_LABELS[s]}</option>
-            ))}
-          </select>
-          <select
-            value={priorityFilter}
-            onChange={(e) =>
-              setPriorityFilter(e.target.value as TodoPriority | "all")
-            }
-            className="fs-field h-9"
-          >
-            <option value="all">All priorities</option>
-            {TODO_PRIORITIES.map((p) => (
-              <option key={p} value={p}>{PRIORITY_LABELS[p]}</option>
-            ))}
-          </select>
-          <select
-            value={subjectFilter}
-            onChange={(e) => setSubjectFilter(e.target.value)}
-            className="fs-field h-9"
-          >
-            <option value="all">All subjects</option>
-            {subjects.map((s) => (
-              <option key={s.id} value={s.id}>{s.name}</option>
-            ))}
-          </select>
+          <Button size="sm" className="gap-2 shrink-0" onClick={() => setCreateOpen(true)}>
+            <Plus className="h-4 w-4" />
+            Add task
+          </Button>
         </div>
-        <Button size="sm" className="gap-2" onClick={() => setCreateOpen(true)}>
-          <Plus className="h-4 w-4" />
-          Add task
-        </Button>
+
+        <div className="flex flex-wrap items-center gap-2">
+          <FilterSelect
+            id="todo-filter-status"
+            aria-label="Filter by status"
+            value={statusFilter}
+            onValueChange={(v) => setStatusFilter(v as TodoStatus | "all")}
+            options={statusOptions}
+          />
+          <FilterSelect
+            id="todo-filter-priority"
+            aria-label="Filter by priority"
+            value={priorityFilter}
+            onValueChange={(v) => setPriorityFilter(v as TodoPriority | "all")}
+            options={priorityOptions}
+          />
+          <FilterSelect
+            id="todo-filter-subject"
+            aria-label="Filter by subject"
+            value={subjectFilter}
+            onValueChange={setSubjectFilter}
+            options={subjectOptions}
+          />
+          {hasActiveFilters && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-9 text-muted-foreground"
+              onClick={clearFilters}
+            >
+              Clear filters
+            </Button>
+          )}
+        </div>
       </div>
 
       <Card>

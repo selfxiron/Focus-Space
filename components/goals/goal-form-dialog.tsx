@@ -9,6 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { FilterSelect } from "@/components/ui/filter-select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createGoalAction, updateGoalAction } from "@/lib/actions/goals";
@@ -96,17 +97,16 @@ export function GoalFormDialog({
           {!isEdit && (
             <div className="space-y-2">
               <Label htmlFor="goal-subject">Subject</Label>
-              <select
+              <FilterSelect
                 id="goal-subject"
                 value={subjectId}
-                onChange={(e) => setSubjectId(e.target.value)}
-                className="fs-field"
-                required
-              >
-                {subjects.map((s) => (
-                  <option key={s.id} value={s.id}>{s.name}</option>
-                ))}
-              </select>
+                onValueChange={setSubjectId}
+                options={subjects.map((s) => ({
+                  value: s.id,
+                  label: s.name,
+                }))}
+                fullWidth
+              />
             </div>
           )}
           <div className="grid gap-4 sm:grid-cols-2">
@@ -124,16 +124,16 @@ export function GoalFormDialog({
             </div>
             <div className="space-y-2">
               <Label htmlFor="goal-period">Period</Label>
-              <select
+              <FilterSelect
                 id="goal-period"
                 value={period}
-                onChange={(e) => setPeriod(e.target.value as GoalPeriod)}
-                className="fs-field"
-              >
-                {GOAL_PERIODS.map((p) => (
-                  <option key={p} value={p}>{PERIOD_LABELS[p]}</option>
-                ))}
-              </select>
+                onValueChange={(v) => setPeriod(v as GoalPeriod)}
+                options={GOAL_PERIODS.map((p) => ({
+                  value: p,
+                  label: PERIOD_LABELS[p],
+                }))}
+                fullWidth
+              />
             </div>
           </div>
           {error && <p className="text-sm text-destructive">{error}</p>}

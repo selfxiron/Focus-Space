@@ -8,8 +8,10 @@ import { MarkdownPreview } from "@/components/notes/markdown-preview";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
+import { FilterSelect } from "@/components/ui/filter-select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { SELECT_NONE } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import {
   createNoteAction,
@@ -36,7 +38,9 @@ export function NotesWorkspace({ notes, subjects }: NotesWorkspaceProps) {
   );
   const [title, setTitle] = useState(notes[0]?.title ?? "");
   const [content, setContent] = useState(notes[0]?.content ?? "");
-  const [subjectId, setSubjectId] = useState(notes[0]?.subjectId ?? "");
+  const [subjectId, setSubjectId] = useState(
+    notes[0]?.subjectId ?? SELECT_NONE
+  );
   const [saveState, setSaveState] = useState<SaveState>("idle");
   const [saveError, setSaveError] = useState<string | null>(null);
   const [preview, setPreview] = useState(false);
@@ -55,13 +59,13 @@ export function NotesWorkspace({ notes, subjects }: NotesWorkspaceProps) {
     if (!selectedNote) {
       setTitle("");
       setContent("");
-      setSubjectId("");
+      setSubjectId(SELECT_NONE);
       return;
     }
     skipNextSaveRef.current = true;
     setTitle(selectedNote.title);
     setContent(selectedNote.content);
-    setSubjectId(selectedNote.subjectId ?? "");
+    setSubjectId(selectedNote.subjectId ?? SELECT_NONE);
     setSaveState("idle");
     setSaveError(null);
   }, [selectedId, selectedNote]);
@@ -76,7 +80,7 @@ export function NotesWorkspace({ notes, subjects }: NotesWorkspaceProps) {
       await updateNoteAction(selectedId, {
         title,
         content,
-        subjectId: subjectId || null,
+        subjectId: subjectId === SELECT_NONE ? null : subjectId,
       });
       setSaveState("saved");
       setLocalNotes((prev) =>
@@ -86,12 +90,16 @@ export function NotesWorkspace({ notes, subjects }: NotesWorkspaceProps) {
                 ...n,
                 title,
                 content,
-                subjectId: subjectId || null,
+                subjectId: subjectId === SELECT_NONE ? null : subjectId,
                 subjectName:
-                  subjects.find((s) => s.id === subjectId)?.name ??
+                  subjectId === SELECT_NONE
+                    ? null
+                    : subjects.find((s) => s.id === subjectId)?.name ??
                   n.subjectName,
                 subjectColor:
-                  subjects.find((s) => s.id === subjectId)?.color ??
+                  subjectId === SELECT_NONE
+                    ? null
+                    : subjects.find((s) => s.id === subjectId)?.color ??
                   n.subjectColor,
                 updatedAt: new Date(),
               }
@@ -126,7 +134,7 @@ export function NotesWorkspace({ notes, subjects }: NotesWorkspaceProps) {
       setSelectedId(data.id);
       setTitle(data.title);
       setContent("");
-      setSubjectId("");
+      setSubjectId(SELECT_NONE);
       setLocalNotes((prev) => [
         {
           id: data.id,
@@ -172,7 +180,7 @@ export function NotesWorkspace({ notes, subjects }: NotesWorkspaceProps) {
         setSelectedId(data.id);
         setTitle(data.title);
         setContent("");
-        setSubjectId("");
+        setSubjectId(SELECT_NONE);
         setLocalNotes((prev) => [
           {
             id: data.id,
@@ -226,16 +234,15 @@ export function NotesWorkspace({ notes, subjects }: NotesWorkspaceProps) {
     <div className="mx-auto max-w-[1200px] space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <select
+          <FilterSelect
             value={subjectFilter}
-            onChange={(e) => setSubjectFilter(e.target.value)}
-            className="fs-field h-9"
-          >
-            <option value="all">All subjects</option>
-            {subjects.map((s) => (
-              <option key={s.id} value={s.id}>{s.name}</option>
-            ))}
-          </select>
+            onValueChange={setSubjectFilter}
+            aria-label="Filter notes by subject"
+            options={[
+              { value: "all", label: "All subjects" },
+              ...subjects.map((s) => ({ value: s.id, label: s.name })),
+            ]}
+          />
           <span className="text-sm text-muted-foreground">
             {filteredNotes.length} note{filteredNotes.length === 1 ? "" : "s"}
           </span>
@@ -317,17 +324,19 @@ export function NotesWorkspace({ notes, subjects }: NotesWorkspaceProps) {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="note-subject">Subject (optional)</Label>
-                    <select
+                    <FilterSelect
                       id="note-subject"
                       value={subjectId}
-                      onChange={(e) => setSubjectId(e.target.value)}
-                      className="fs-field"
-                    >
-                      <option value="">None</option>
-                      {subjects.map((s) => (
-                        <option key={s.id} value={s.id}>{s.name}</option>
-                      ))}
-                    </select>
+                      onValueChange={setSubjectId}
+                      options={[
+                        { value: SELECT_NONE, label: "None" },
+                        ...subjects.map((s) => ({
+                          value: s.id,
+                          label: s.name,
+                        })),
+                      ]}
+                      fullWidth
+                    />
                   </div>
                 </div>
                 <div className="flex items-center gap-2">

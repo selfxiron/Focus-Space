@@ -9,8 +9,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { FilterSelect } from "@/components/ui/filter-select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { SELECT_NONE } from "@/components/ui/select";
 import { createTodoAction, updateTodoAction } from "@/lib/actions/todos";
 import type { SubjectRow } from "@/lib/data/subjects";
 import type { TodoWithSubject } from "@/lib/data/todos";
@@ -44,7 +46,9 @@ export function TodoFormDialog({
     todo?.priority ?? "medium"
   );
   const [status, setStatus] = useState<TodoStatus>(todo?.status ?? "backlog");
-  const [subjectId, setSubjectId] = useState(todo?.subjectId ?? "");
+  const [subjectId, setSubjectId] = useState(
+    todo?.subjectId ?? SELECT_NONE
+  );
   const [dueDate, setDueDate] = useState(
     todo?.dueDate ? toLocalInput(todo.dueDate) : ""
   );
@@ -56,7 +60,7 @@ export function TodoFormDialog({
       setTitle(todo?.title ?? "");
       setPriority(todo?.priority ?? "medium");
       setStatus(todo?.status ?? "backlog");
-      setSubjectId(todo?.subjectId ?? "");
+      setSubjectId(todo?.subjectId ?? SELECT_NONE);
       setDueDate(todo?.dueDate ? toLocalInput(todo.dueDate) : "");
       setError(null);
     }
@@ -71,7 +75,8 @@ export function TodoFormDialog({
       title,
       priority,
       status,
-      subjectId: subjectId || null,
+      subjectId:
+        subjectId === SELECT_NONE ? null : subjectId,
       dueDate: dueDate ? new Date(dueDate).toISOString() : null,
     };
 
@@ -89,6 +94,19 @@ export function TodoFormDialog({
       setLoading(false);
     }
   }
+
+  const priorityOptions = TODO_PRIORITIES.map((p) => ({
+    value: p,
+    label: PRIORITY_LABELS[p],
+  }));
+  const statusOptions = TODO_STATUSES.map((s) => ({
+    value: s,
+    label: STATUS_LABELS[s],
+  }));
+  const subjectOptions = [
+    { value: SELECT_NONE, label: "None" },
+    ...subjects.map((s) => ({ value: s.id, label: s.name })),
+  ];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -110,44 +128,34 @@ export function TodoFormDialog({
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="todo-priority">Priority</Label>
-              <select
+              <FilterSelect
                 id="todo-priority"
                 value={priority}
-                onChange={(e) => setPriority(e.target.value as TodoPriority)}
-                className="fs-field"
-              >
-                {TODO_PRIORITIES.map((p) => (
-                  <option key={p} value={p}>{PRIORITY_LABELS[p]}</option>
-                ))}
-              </select>
+                onValueChange={(v) => setPriority(v as TodoPriority)}
+                options={priorityOptions}
+                fullWidth
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="todo-status">Status</Label>
-              <select
+              <FilterSelect
                 id="todo-status"
                 value={status}
-                onChange={(e) => setStatus(e.target.value as TodoStatus)}
-                className="fs-field"
-              >
-                {TODO_STATUSES.map((s) => (
-                  <option key={s} value={s}>{STATUS_LABELS[s]}</option>
-                ))}
-              </select>
+                onValueChange={(v) => setStatus(v as TodoStatus)}
+                options={statusOptions}
+                fullWidth
+              />
             </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="todo-subject">Subject (optional)</Label>
-            <select
+            <FilterSelect
               id="todo-subject"
               value={subjectId}
-              onChange={(e) => setSubjectId(e.target.value)}
-              className="fs-field"
-            >
-              <option value="">None</option>
-              {subjects.map((s) => (
-                <option key={s.id} value={s.id}>{s.name}</option>
-              ))}
-            </select>
+              onValueChange={setSubjectId}
+              options={subjectOptions}
+              fullWidth
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="todo-due">Due date (optional)</Label>

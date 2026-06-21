@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { FilterSelect } from "@/components/ui/filter-select";
 import { deleteTodoAction, updateTodoAction } from "@/lib/actions/todos";
 import type { TodoWithSubject } from "@/lib/data/todos";
 import {
@@ -96,18 +97,19 @@ export function TodoTableView({
                 {PRIORITY_LABELS[todo.priority]}
               </td>
               <td className="px-4 py-3">
-                <select
+                <FilterSelect
                   value={todo.status}
-                  onChange={(e) =>
-                    handleStatusChange(todo.id, e.target.value as TodoStatus)
+                  onValueChange={(v) =>
+                    handleStatusChange(todo.id, v as TodoStatus)
                   }
                   disabled={busyId === todo.id}
-                  className="rounded-[8px] border border-input bg-card px-2 py-1 text-xs"
-                >
-                  {TODO_STATUSES.map((s) => (
-                    <option key={s} value={s}>{STATUS_LABELS[s]}</option>
-                  ))}
-                </select>
+                  size="sm"
+                  triggerClassName="min-w-[7.5rem]"
+                  options={TODO_STATUSES.map((s) => ({
+                    value: s,
+                    label: STATUS_LABELS[s],
+                  }))}
+                />
               </td>
               <td className="px-4 py-3">
                 {todo.dueDate ? <TodoDueDate date={todo.dueDate} /> : "—"}

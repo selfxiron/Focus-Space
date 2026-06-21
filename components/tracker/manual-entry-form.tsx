@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { FilterSelect } from "@/components/ui/filter-select";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -75,16 +76,16 @@ export function ManualEntryForm({ subjects }: ManualEntryFormProps) {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="manual-subject">Subject</Label>
-            <select
+            <FilterSelect
               id="manual-subject"
               value={subjectId}
-              onChange={(e) => setSubjectId(e.target.value)}
-              className="fs-field"
-            >
-              {subjects.map((s) => (
-                <option key={s.id} value={s.id}>{s.name}</option>
-              ))}
-            </select>
+              onValueChange={setSubjectId}
+              options={subjects.map((s) => ({
+                value: s.id,
+                label: s.name,
+              }))}
+              fullWidth
+            />
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
