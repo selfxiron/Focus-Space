@@ -12,7 +12,8 @@ Self-hosted study tracker. Each account is isolated (single-user, multi-tenant v
 | **Todos** | Kanban + table, filters, priority, due dates |
 | **Subjects** | CRUD, default subjects on first visit, weekly/monthly goals with progress rings |
 | **Pomodoro** | Floating widget; logs accurate duration to session log |
-| **Notes** | Planned (placeholder page) |
+| **Notes** | Markdown editor with preview, auto-save, subject filter |
+| **Command palette** | ⌘K / Ctrl+K navigation and quick actions |
 | **Settings** | Sign out |
 
 On first load, three default subjects are seeded automatically: Study, Coursework, Projects.
@@ -117,7 +118,7 @@ app/
   (auth)/login, signup
   (app)/           dashboard, tracker, todos, notes, subjects, settings
   auth/callback/   OAuth / email confirmation handler
-components/        UI, dashboard, tracker, todos, goals, pomodoro, layout
+components/        UI, dashboard, tracker, todos, notes, goals, pomodoro, layout
 lib/
   actions/         Server actions (mutations)
   data/            Supabase read helpers (RLS-scoped)

@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 
 import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar";
+import { CommandPalette } from "@/components/command/command-palette";
 import { PomodoroWidget } from "@/components/pomodoro/pomodoro-widget";
 import { TimerProvider } from "@/components/tracker/timer-provider";
 import type { TimeEntryWithSubject } from "@/lib/data/time-entries";
@@ -33,6 +34,7 @@ export function AppShell({
         </div>
         <PomodoroWidget />
       </div>
+      <CommandPalette />
     </TimerProvider>
   );
 }
