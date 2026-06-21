@@ -1,0 +1,46 @@
+/* Focus Space design tokens */
+:root {
+  /* Surfaces */
+  --background: #f4f6f8;
+  --card: #ffffff;
+  --sidebar: #ffffff;
+
+  /* Brand / teal */
+  --brand: #2dd4bf;
+  --brand-dark: #14b8a6;
+  --brand-muted: rgba(45, 212, 191, 0.12);
+
+  /* Pastel stat cards */
+  --pastel-peach: #ffe8d6;
+  --pastel-mint: #d8f5e4;
+  --pastel-lavender: #e8deff;
+  --pastel-sky: #d6eeff;
+
+  /* Text */
+  --foreground: #1a1d26;
+  --muted: #8b919e;
+  --muted-foreground: #8b919e;
+
+  /* Borders & shadows */
+  --border: #e8eaed;
+  --shadow-soft: 0 4px 24px rgba(0, 0, 0, 0.06);
+  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.04);
+
+  /* Radius */
+  --radius-card: 20px;
+  --radius-button: 12px;
+  --radius-pill: 12px;
+
+  /* shadcn compatibility */
+  --primary: #14b8a6;
+  --primary-foreground: #ffffff;
+  --secondary: #f4f6f8;
+  --secondary-foreground: #1a1d26;
+  --accent: #f4f6f8;
+  --accent-foreground: #1a1d26;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --ring: #2dd4bf;
+  --input: #e8eaed;
+  --radius: 12px;
+}
