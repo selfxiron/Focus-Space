@@ -48,21 +48,41 @@ export function TimerProvider({
   const [activeTimer, setActiveTimer] = useState(initialActiveTimer);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const isOptimisticRef = useRef(false);
+  /** Client start time for elapsed display — survives server confirm + refresh */
+  const displayStartMsRef = useRef<number | null>(
+    initialActiveTimer?.startTime
+      ? new Date(initialActiveTimer.startTime).getTime()
+      : null
+  );
 
   useEffect(() => {
     if (isOptimisticRef.current) {
       return;
     }
     setActiveTimer(initialActiveTimer);
+
+    if (!initialActiveTimer?.startTime) {
+      displayStartMsRef.current = null;
+      return;
+    }
+
+    const serverMs = new Date(initialActiveTimer.startTime).getTime();
+    if (displayStartMsRef.current === null) {
+      displayStartMsRef.current = serverMs;
+    } else {
+      // Keep the earlier instant so elapsed time never jumps backward after refresh
+      displayStartMsRef.current = Math.min(displayStartMsRef.current, serverMs);
+    }
   }, [initialActiveTimer]);
 
   useEffect(() => {
-    if (!activeTimer?.startTime) {
+    const startMs = displayStartMsRef.current;
+
+    if (!activeTimer?.startTime || startMs === null) {
       setElapsedSeconds(0);
       return;
     }
 
-    const startMs = new Date(activeTimer.startTime).getTime();
     const tick = () =>
       setElapsedSeconds(Math.floor((Date.now() - startMs) / 1000));
 
@@ -74,6 +94,7 @@ export function TimerProvider({
   const beginActiveTimer = useCallback((subject: ActiveTimerSubject) => {
     const now = new Date();
     isOptimisticRef.current = true;
+    displayStartMsRef.current = now.getTime();
     setActiveTimer({
       id: OPTIMISTIC_TIMER_ID,
       userId: "",
@@ -96,6 +117,7 @@ export function TimerProvider({
 
   const clearActiveTimer = useCallback(() => {
     isOptimisticRef.current = false;
+    displayStartMsRef.current = null;
     setActiveTimer(null);
     setElapsedSeconds(0);
   }, []);

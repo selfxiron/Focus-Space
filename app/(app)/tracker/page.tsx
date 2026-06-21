@@ -1,3 +1,4 @@
+import { FadeIn } from "@/components/motion/fade-in";
 import { LiveTimer } from "@/components/tracker/live-timer";
 import { ManualEntryForm } from "@/components/tracker/manual-entry-form";
 import { SessionLog } from "@/components/tracker/session-log";
@@ -17,9 +18,15 @@ export default async function TrackerPage() {
 
     return (
       <div className="mx-auto max-w-[960px] space-y-6">
-        <LiveTimer subjects={subjects} />
-        <ManualEntryForm subjects={subjects} />
-        <SessionLog entries={entries} />
+        <FadeIn>
+          <LiveTimer subjects={subjects} />
+        </FadeIn>
+        <FadeIn delay={0.08}>
+          <ManualEntryForm subjects={subjects} />
+        </FadeIn>
+        <FadeIn delay={0.12}>
+          <SessionLog entries={entries} />
+        </FadeIn>
       </div>
     );
   } catch (error) {
