@@ -3,7 +3,8 @@ import { toDbError } from "@/lib/db/schema-error";
 import { elapsedSecondsInPeriod } from "@/lib/time/duration";
 import type { GoalPeriod } from "@/lib/goals/constants";
 import { getPeriodStart } from "@/lib/time/period";
-import { getActiveTimeEntry } from "@/lib/data/time-entries";
+import { getActiveTimeEntry, type TimeEntryWithSubject } from "@/lib/data/time-entries";
+import { getUserSettings } from "@/lib/data/user-settings";
 
 export type GoalRow = {
   id: string;
@@ -46,51 +47,83 @@ function resolveSubject(
   return subjects;
 }
 
-async function getSecondsBySubjectSince(
+async function getSecondsBySubjectForPeriods(
   userId: string,
-  since: Date,
+  weeklySince: Date,
+  monthlySince: Date,
   activeEntry: Awaited<ReturnType<typeof getActiveTimeEntry>>
-): Promise<Map<string, number>> {
+): Promise<{ weekly: Map<string, number>; monthly: Map<string, number> }> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("time_entries")
-    .select("subject_id, duration_minutes, start_time, end_time")
+    .select("subject_id, start_time, end_time")
     .eq("user_id", userId)
-    .gte("end_time", since.toISOString());
+    .not("end_time", "is", null)
+    .gte("end_time", monthlySince.toISOString());
 
   if (error) {
     throw toDbError(error);
   }
 
-  const totals = new Map<string, number>();
+  const weekly = new Map<string, number>();
+  const monthly = new Map<string, number>();
 
   for (const row of data ?? []) {
-    const seconds = elapsedSecondsInPeriod(
-      since,
-      new Date(row.start_time),
-      new Date(row.end_time!)
-    );
-    totals.set(row.subject_id, (totals.get(row.subject_id) ?? 0) + seconds);
+    const start = new Date(row.start_time);
+    const end = new Date(row.end_time!);
+    const monthlySeconds = elapsedSecondsInPeriod(monthlySince, start, end);
+    if (monthlySeconds > 0) {
+      monthly.set(
+        row.subject_id,
+        (monthly.get(row.subject_id) ?? 0) + monthlySeconds
+      );
+    }
+    const weeklySeconds = elapsedSecondsInPeriod(weeklySince, start, end);
+    if (weeklySeconds > 0) {
+      weekly.set(
+        row.subject_id,
+        (weekly.get(row.subject_id) ?? 0) + weeklySeconds
+      );
+    }
   }
 
   if (activeEntry) {
     const now = new Date();
-    const seconds = elapsedSecondsInPeriod(
-      since,
+    const monthlySeconds = elapsedSecondsInPeriod(
+      monthlySince,
       new Date(activeEntry.startTime),
       now
     );
-    totals.set(
-      activeEntry.subjectId,
-      (totals.get(activeEntry.subjectId) ?? 0) + seconds
+    if (monthlySeconds > 0) {
+      monthly.set(
+        activeEntry.subjectId,
+        (monthly.get(activeEntry.subjectId) ?? 0) + monthlySeconds
+      );
+    }
+    const weeklySeconds = elapsedSecondsInPeriod(
+      weeklySince,
+      new Date(activeEntry.startTime),
+      now
     );
+    if (weeklySeconds > 0) {
+      weekly.set(
+        activeEntry.subjectId,
+        (weekly.get(activeEntry.subjectId) ?? 0) + weeklySeconds
+      );
+    }
   }
 
-  return totals;
+  return { weekly, monthly };
 }
 
+export type GoalsProgressOptions = {
+  timezone?: string;
+  activeEntry?: TimeEntryWithSubject | null;
+};
+
 export async function listGoalsWithProgress(
-  userId: string
+  userId: string,
+  options?: GoalsProgressOptions
 ): Promise<GoalWithProgress[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -117,16 +150,24 @@ export async function listGoalsWithProgress(
     throw toDbError(error);
   }
 
+  const timezone =
+    options?.timezone ?? (await getUserSettings(userId)).timezone;
   const now = new Date();
-  const weeklySince = getPeriodStart("weekly", now);
-  const monthlySince = getPeriodStart("monthly", now);
+  const weeklySince = getPeriodStart("weekly", now, timezone);
+  const monthlySince = getPeriodStart("monthly", now, timezone);
 
-  const activeEntry = await getActiveTimeEntry(userId);
+  const activeEntry =
+    options?.activeEntry !== undefined
+      ? options.activeEntry
+      : await getActiveTimeEntry(userId);
 
-  const [weeklySeconds, monthlySeconds] = await Promise.all([
-    getSecondsBySubjectSince(userId, weeklySince, activeEntry),
-    getSecondsBySubjectSince(userId, monthlySince, activeEntry),
-  ]);
+  const { weekly: weeklySeconds, monthly: monthlySeconds } =
+    await getSecondsBySubjectForPeriods(
+      userId,
+      weeklySince,
+      monthlySince,
+      activeEntry
+    );
 
   return (data as unknown as GoalDbRow[]).map((row) => {
     const subject = resolveSubject(row.subjects);

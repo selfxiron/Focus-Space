@@ -3,14 +3,16 @@
  * Run: node scripts/validate-schema.mjs
  */
 
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
 const root = join(import.meta.dirname, "..");
-const migration = readFileSync(
-  join(root, "supabase/migrations/0000_initial.sql"),
-  "utf8"
-);
+const migrationDir = join(root, "supabase/migrations");
+const migration = readdirSync(migrationDir)
+  .filter((file) => file.endsWith(".sql"))
+  .sort()
+  .map((file) => readFileSync(join(migrationDir, file), "utf8"))
+  .join("\n");
 
 const expectedTables = [
   "subjects",
@@ -19,6 +21,7 @@ const expectedTables = [
   "goals",
   "notes",
   "pomodoro_sessions",
+  "user_settings",
 ];
 
 const missing = expectedTables.filter(

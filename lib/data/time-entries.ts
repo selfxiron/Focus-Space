@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 import { createClient } from "@/lib/supabase/server";
 import { toDbError } from "@/lib/db/schema-error";
 
@@ -74,7 +76,7 @@ const entrySelect = `
   )
 `;
 
-export async function getActiveTimeEntry(userId: string) {
+export const getActiveTimeEntry = cache(async (userId: string) => {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("time_entries")
@@ -94,12 +96,10 @@ export async function getActiveTimeEntry(userId: string) {
   }
 
   return mapTimeEntry(data as unknown as TimeEntryDbRow);
-}
+});
 
-export async function listRecentTimeEntries(
-  userId: string,
-  limit = 50
-): Promise<TimeEntryWithSubject[]> {
+export const listRecentTimeEntries = cache(
+  async (userId: string, limit = 50): Promise<TimeEntryWithSubject[]> => {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("time_entries")
@@ -113,7 +113,54 @@ export async function listRecentTimeEntries(
   }
 
   return (data as unknown as TimeEntryDbRow[]).map(mapTimeEntry);
-}
+  }
+);
+
+export type CompletedEntrySlice = {
+  subjectId: string;
+  startTime: Date;
+  endTime: Date;
+};
+
+export const listCompletedEntriesSince = cache(
+  async (userId: string, since: Date): Promise<CompletedEntrySlice[]> => {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("time_entries")
+      .select("subject_id, start_time, end_time")
+      .eq("user_id", userId)
+      .not("end_time", "is", null)
+      .gte("end_time", since.toISOString());
+
+    if (error) {
+      throw toDbError(error);
+    }
+
+    return (data ?? []).map((row) => ({
+      subjectId: row.subject_id,
+      startTime: new Date(row.start_time),
+      endTime: new Date(row.end_time!),
+    }));
+  }
+);
+
+export const listStudyEndTimesSince = cache(
+  async (userId: string, since: Date): Promise<Date[]> => {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("time_entries")
+      .select("end_time")
+      .eq("user_id", userId)
+      .not("end_time", "is", null)
+      .gte("end_time", since.toISOString());
+
+    if (error) {
+      throw toDbError(error);
+    }
+
+    return (data ?? []).map((row) => new Date(row.end_time!));
+  }
+);
 
 export async function getTimeEntryById(userId: string, entryId: string) {
   const supabase = await createClient();

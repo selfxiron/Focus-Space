@@ -1,4 +1,7 @@
+import { Timer } from "lucide-react";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import type { DashboardSession } from "@/lib/data/dashboard";
 
 export function RecentSessions({
@@ -14,9 +17,11 @@ export function RecentSessions({
       </CardHeader>
       <CardContent className="space-y-3">
         {sessions.length === 0 ? (
-          <p className="py-6 text-center text-sm text-muted-foreground">
-            No sessions yet. Start the timer or use Pomodoro.
-          </p>
+          <EmptyState
+            icon={Timer}
+            title="No sessions yet"
+            description="Start the live timer or run a Pomodoro focus block."
+          />
         ) : (
           sessions.map((session, i) => (
             <div

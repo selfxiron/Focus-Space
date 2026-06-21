@@ -108,6 +108,16 @@ export const pomodoroSessions = pgTable("pomodoro_sessions", {
     .notNull(),
 });
 
+export const userSettings = pgTable("user_settings", {
+  userId: uuid("user_id").primaryKey(),
+  timezone: text("timezone").notNull().default("UTC"),
+  pomodoroWorkMinutes: integer("pomodoro_work_minutes").notNull().default(25),
+  pomodoroBreakMinutes: integer("pomodoro_break_minutes").notNull().default(5),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+});
+
 export const subjectsRelations = relations(subjects, ({ many }) => ({
   timeEntries: many(timeEntries),
   todos: many(todos),

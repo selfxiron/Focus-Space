@@ -19,7 +19,7 @@ export function createPostgresClient() {
       ...baseOptions,
       host,
       port: Number(process.env.DATABASE_PORT ?? 6543),
-      username: user,
+      user,
       password,
       database: process.env.DATABASE_NAME?.trim() ?? "postgres",
     });

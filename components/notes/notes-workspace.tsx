@@ -2,11 +2,12 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Eye, FileText, Plus, Trash2 } from "lucide-react";
+import { Eye, FilePlus, FileText, Plus, Trash2 } from "lucide-react";
 
 import { MarkdownPreview } from "@/components/notes/markdown-preview";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -254,9 +255,20 @@ export function NotesWorkspace({ notes, subjects }: NotesWorkspaceProps) {
         <Card className="border-border/60 shadow-[var(--shadow-card)]">
           <CardContent className="p-2">
             {filteredNotes.length === 0 ? (
-              <p className="px-3 py-8 text-center text-sm text-muted-foreground">
-                No notes yet. Create one to start writing.
-              </p>
+              <EmptyState
+                icon={FilePlus}
+                title="No notes yet"
+                description="Create a note to capture study notes in Markdown."
+                action={
+                  <Button
+                    size="sm"
+                    onClick={() => void handleCreate()}
+                    disabled={creating}
+                  >
+                    New note
+                  </Button>
+                }
+              />
             ) : (
               <ul className="space-y-1">
                 {filteredNotes.map((note) => (

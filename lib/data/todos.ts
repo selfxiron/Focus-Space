@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 import { createClient } from "@/lib/supabase/server";
 import { toDbError } from "@/lib/db/schema-error";
 import type { TodoPriority, TodoStatus } from "@/lib/todos/constants";
@@ -82,20 +84,28 @@ const todoSelect = `
   )
 `;
 
-export async function listTodos(userId: string): Promise<TodoWithSubject[]> {
+export const listTodos = cache(
+  async (userId: string, limit?: number): Promise<TodoWithSubject[]> => {
   const supabase = await createClient();
-  const { data, error } = await supabase
+  let query = supabase
     .from("todos")
     .select(todoSelect)
     .eq("user_id", userId)
     .order("updated_at", { ascending: false });
+
+  if (limit !== undefined) {
+    query = query.limit(limit);
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     throw toDbError(error);
   }
 
   return (data as unknown as TodoDbRow[]).map(mapTodo);
-}
+  }
+);
 
 export async function getTodoById(userId: string, todoId: string) {
   const supabase = await createClient();

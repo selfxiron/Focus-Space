@@ -1,3 +1,5 @@
+import { unstable_noStore as noStore } from "next/cache";
+
 import { createClient } from "@/lib/supabase/server";
 import { DEFAULT_SUBJECTS } from "@/lib/db/schema";
 import { toDbError } from "@/lib/db/schema-error";
@@ -37,16 +39,17 @@ function mapSubject(row: SubjectDbRow): SubjectRow {
 export async function ensureDefaultSubjects(userId: string) {
   const supabase = await createClient();
 
-  const { count, error: countError } = await supabase
+  const { data: existing, error: checkError } = await supabase
     .from("subjects")
-    .select("*", { count: "exact", head: true })
-    .eq("user_id", userId);
+    .select("id")
+    .eq("user_id", userId)
+    .limit(1);
 
-  if (countError) {
-    throw toDbError(countError);
+  if (checkError) {
+    throw toDbError(checkError);
   }
 
-  if ((count ?? 0) > 0) {
+  if (existing && existing.length > 0) {
     return;
   }
 
@@ -66,6 +69,7 @@ export async function ensureDefaultSubjects(userId: string) {
 }
 
 export async function listSubjects(userId: string) {
+  noStore();
   await ensureDefaultSubjects(userId);
 
   const supabase = await createClient();
@@ -83,6 +87,7 @@ export async function listSubjects(userId: string) {
 }
 
 export async function getSubjectById(userId: string, subjectId: string) {
+  noStore();
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("subjects")

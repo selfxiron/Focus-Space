@@ -5,9 +5,9 @@ import { useRouter } from "next/navigation";
 import { Coffee, Pause, Play, Timer, X } from "lucide-react";
 
 import { useTimer } from "@/components/tracker/timer-provider";
+import { useUserSettings } from "@/components/settings/settings-provider";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { getSubjectsAction } from "@/lib/actions/subjects";
 import { completePomodoroWorkAction } from "@/lib/actions/pomodoro";
 import type { SubjectRow } from "@/lib/data/subjects";
 import { notifySessionLogged } from "@/lib/tracker/session-events";
@@ -15,17 +15,15 @@ import { cn, formatElapsedSeconds } from "@/lib/utils";
 
 type PomodoroPhase = "idle" | "work" | "break";
 
-const DEFAULT_WORK = 25;
-const DEFAULT_BREAK = 5;
-
-export function PomodoroWidget() {
+export function PomodoroWidget({ subjects: initialSubjects }: { subjects: SubjectRow[] }) {
   const router = useRouter();
   const { activeTimer } = useTimer();
+  const userSettings = useUserSettings();
   const [expanded, setExpanded] = useState(false);
-  const [subjects, setSubjects] = useState<SubjectRow[]>([]);
+  const [subjects, setSubjects] = useState(initialSubjects);
   const [subjectId, setSubjectId] = useState("");
-  const [workMinutes, setWorkMinutes] = useState(DEFAULT_WORK);
-  const [breakMinutes, setBreakMinutes] = useState(DEFAULT_BREAK);
+  const [workMinutes, setWorkMinutes] = useState(userSettings.pomodoroWorkMinutes);
+  const [breakMinutes, setBreakMinutes] = useState(userSettings.pomodoroBreakMinutes);
   const [phase, setPhase] = useState<PomodoroPhase>("idle");
   const [secondsLeft, setSecondsLeft] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -38,19 +36,29 @@ export function PomodoroWidget() {
   const pausedTotalMsRef = useRef(0);
 
   useEffect(() => {
-    if (!expanded || subjects.length > 0) return;
+    setSubjects(initialSubjects);
+  }, [initialSubjects]);
 
-    getSubjectsAction()
-      .then((list) => {
-        setSubjects(list);
-        if (!subjectId && list[0]) {
-          setSubjectId(list[0].id);
-        }
-      })
-      .catch(() => {
-        setError("Could not load subjects");
-      });
-  }, [expanded, subjects.length, subjectId]);
+  useEffect(() => {
+    if (subjectId && subjects.some((s) => s.id === subjectId)) {
+      return;
+    }
+    if (subjects[0]) {
+      setSubjectId(subjects[0].id);
+    } else {
+      setSubjectId("");
+    }
+  }, [subjects, subjectId]);
+
+  useEffect(() => {
+    if (phase !== "idle") return;
+    setWorkMinutes(userSettings.pomodoroWorkMinutes);
+    setBreakMinutes(userSettings.pomodoroBreakMinutes);
+  }, [
+    userSettings.pomodoroWorkMinutes,
+    userSettings.pomodoroBreakMinutes,
+    phase,
+  ]);
 
   const completeWork = useCallback(
     async (natural: boolean) => {
@@ -128,7 +136,11 @@ export function PomodoroWidget() {
     }
 
     if (!subjectId) {
-      setError("Select a subject");
+      setError(
+        subjects.length === 0
+          ? "Add a subject on the Subjects page first"
+          : "Select a subject"
+      );
       return;
     }
 
@@ -220,7 +232,8 @@ export function PomodoroWidget() {
               id="pomodoro-subject"
               value={subjectId}
               onChange={(e) => setSubjectId(e.target.value)}
-              className="flex h-10 w-full rounded-[12px] border border-input bg-card px-3 text-sm"
+              disabled={subjects.length === 0}
+              className="flex h-10 w-full rounded-[12px] border border-input bg-card px-3 text-sm disabled:opacity-60"
             >
               {subjects.map((s) => (
                 <option key={s.id} value={s.id}>{s.name}</option>
@@ -237,7 +250,9 @@ export function PomodoroWidget() {
                 max={120}
                 value={workMinutes}
                 onChange={(e) =>
-                  setWorkMinutes(Number(e.target.value) || DEFAULT_WORK)
+                  setWorkMinutes(
+                    Number(e.target.value) || userSettings.pomodoroWorkMinutes
+                  )
                 }
                 className="flex h-10 w-full rounded-[12px] border border-input bg-card px-3 text-sm"
               />
@@ -257,7 +272,11 @@ export function PomodoroWidget() {
               />
             </div>
           </div>
-          <Button className="w-full gap-2" onClick={handleStart}>
+          <Button
+            className="w-full gap-2"
+            onClick={handleStart}
+            disabled={subjects.length === 0}
+          >
             <Play className="h-4 w-4" />
             Start focus
           </Button>

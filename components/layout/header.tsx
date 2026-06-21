@@ -32,7 +32,7 @@ const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
   },
   "/settings": {
     title: "Settings",
-    subtitle: "Account and sign out",
+    subtitle: "Preferences, export, and account",
   },
 };
 

@@ -14,7 +14,7 @@ Self-hosted study tracker. Each account is isolated (single-user, multi-tenant v
 | **Pomodoro** | Floating widget; logs accurate duration to session log |
 | **Notes** | Markdown editor with preview, auto-save, subject filter |
 | **Command palette** | ⌘K / Ctrl+K navigation and quick actions |
-| **Settings** | Sign out |
+| **Settings** | Timezone, Pomodoro defaults, JSON export, sign out |
 
 On first load, three default subjects are seeded automatically: Study, Coursework, Projects.
 
@@ -60,6 +60,7 @@ Run the full migration in the Supabase SQL Editor (schema, RLS, indexes):
 
 ```text
 supabase/migrations/0000_initial.sql
+supabase/migrations/0001_user_settings.sql
 ```
 
 Or, with database env vars set:
@@ -67,6 +68,8 @@ Or, with database env vars set:
 ```bash
 npm run db:setup
 ```
+
+`db:setup` applies every file in `supabase/migrations/` in order.
 
 Validate tables and RLS locally:
 

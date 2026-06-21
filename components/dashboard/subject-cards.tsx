@@ -1,4 +1,7 @@
+import { FolderKanban } from "lucide-react";
+
 import { Card, CardContent } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import type { DashboardSubjectHours } from "@/lib/data/dashboard";
 import { getSubjectIcon } from "@/lib/subjects/constants";
 
@@ -16,9 +19,11 @@ export function SubjectCards({
 }) {
   if (subjects.length === 0) {
     return (
-      <p className="text-sm text-muted-foreground">
-        No subjects yet. Add subjects to start tracking.
-      </p>
+      <EmptyState
+        icon={FolderKanban}
+        title="No subjects yet"
+        description="Add subjects to organize study time and goals."
+      />
     );
   }
 

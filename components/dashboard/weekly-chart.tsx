@@ -11,8 +11,11 @@ import {
   YAxis,
 } from "recharts";
 
+import { BarChart3 } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import type { DashboardChartDay } from "@/lib/data/dashboard";
 
 interface WeeklyChartProps {
@@ -54,9 +57,12 @@ export function WeeklyChart({ chart7d, chart14d }: WeeklyChartProps) {
       </CardHeader>
       <CardContent className="h-[280px] pt-0">
         {data.every((d) => d.hours === 0) ? (
-          <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
-            No study time in this period yet
-          </div>
+          <EmptyState
+            icon={BarChart3}
+            title="No study time yet"
+            description="Tracked hours will appear here once you log sessions."
+            className="h-full"
+          />
         ) : (
           <ResponsiveContainer width="100%" height="100%">
             <BarChart

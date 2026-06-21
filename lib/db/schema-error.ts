@@ -22,7 +22,20 @@ export function isMissingTableError(error: unknown): boolean {
   );
 }
 
-export function toDbError(error: { message: string }): Error {
+export function isDuplicateKeyError(error: unknown): boolean {
+  if (typeof error !== "object" || error === null) return false;
+  const code = "code" in error ? String((error as { code: unknown }).code) : "";
+  const message =
+    "message" in error
+      ? String((error as { message: unknown }).message)
+      : "";
+  return (
+    code === "23505" ||
+    message.includes("duplicate key value violates unique constraint")
+  );
+}
+
+export function toDbError(error: { message: string; code?: string }): Error {
   if (isMissingTableError(error)) {
     return new SchemaNotReadyError(error.message);
   }

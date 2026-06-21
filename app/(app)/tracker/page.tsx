@@ -12,7 +12,7 @@ export default async function TrackerPage() {
     const user = await requireUser();
     const [subjects, entries] = await Promise.all([
       listSubjects(user.id),
-      listRecentTimeEntries(user.id),
+      listRecentTimeEntries(user.id, 30),
     ]);
 
     return (

@@ -13,11 +13,27 @@ function revalidateSubjects() {
   revalidatePath("/tracker");
   revalidatePath("/subjects");
   revalidatePath("/todos");
+  revalidatePath("/notes");
 }
 
-export async function getSubjectsAction() {
+export type SubjectOption = {
+  id: string;
+  name: string;
+  color: string;
+  icon: string;
+  sortOrder: number;
+};
+
+export async function getSubjectsAction(): Promise<SubjectOption[]> {
   const user = await requireUser();
-  return listSubjects(user.id);
+  const subjects = await listSubjects(user.id);
+  return subjects.map(({ id, name, color, icon, sortOrder }) => ({
+    id,
+    name,
+    color,
+    icon,
+    sortOrder,
+  }));
 }
 
 export async function createSubjectAction(input: {
@@ -121,19 +137,57 @@ export async function deleteSubjectAction(subjectId: string) {
   }
 
   const supabase = await createClient();
-  const { data, error } = await supabase
+
+  const dependentOps = [
+    supabase
+      .from("time_entries")
+      .delete()
+      .eq("user_id", user.id)
+      .eq("subject_id", subjectId),
+    supabase
+      .from("pomodoro_sessions")
+      .delete()
+      .eq("user_id", user.id)
+      .eq("subject_id", subjectId),
+    supabase
+      .from("goals")
+      .delete()
+      .eq("user_id", user.id)
+      .eq("subject_id", subjectId),
+    supabase
+      .from("todos")
+      .update({ subject_id: null })
+      .eq("user_id", user.id)
+      .eq("subject_id", subjectId),
+    supabase
+      .from("notes")
+      .update({ subject_id: null })
+      .eq("user_id", user.id)
+      .eq("subject_id", subjectId),
+  ];
+
+  for (const op of dependentOps) {
+    const { error } = await op;
+    if (error) {
+      throw toDbError(error);
+    }
+  }
+
+  const { error } = await supabase
     .from("subjects")
     .delete()
     .eq("id", subjectId)
-    .eq("user_id", user.id)
-    .select("id");
+    .eq("user_id", user.id);
 
   if (error) {
     throw toDbError(error);
   }
 
-  if (!data?.length) {
-    throw new Error("Subject could not be deleted");
+  const stillExists = await getSubjectById(user.id, subjectId);
+  if (stillExists) {
+    throw new Error(
+      "Subject could not be deleted. Confirm subjects delete RLS policies exist in Supabase."
+    );
   }
 
   revalidateSubjects();

@@ -101,11 +101,11 @@ export function CommandPalette() {
             Open todos
           </CommandItem>
           <CommandItem
-            value="Start timer tracker"
-            onSelect={() => navigate("/tracker")}
+            value="Settings preferences export"
+            onSelect={() => navigate("/settings")}
           >
-            <Timer className="h-4 w-4 text-muted-foreground" />
-            Open tracker
+            <Settings className="h-4 w-4 text-muted-foreground" />
+            Open settings
           </CommandItem>
         </CommandGroup>
       </CommandList>

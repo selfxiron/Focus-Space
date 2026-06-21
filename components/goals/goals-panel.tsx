@@ -4,10 +4,13 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 
+import { Target } from "lucide-react";
+
 import { GoalFormDialog } from "@/components/goals/goal-form-dialog";
 import { GoalProgressRing } from "@/components/goals/goal-progress-ring";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import { deleteGoalAction } from "@/lib/actions/goals";
 import type { SubjectRow } from "@/lib/data/subjects";
 import type { GoalWithProgress } from "@/lib/data/goals";
@@ -68,8 +71,17 @@ export function GoalsPanel({ goals, subjects }: GoalsPanelProps) {
 
       {goals.length === 0 ? (
         <Card className="border-border/60 shadow-[var(--shadow-card)]">
-          <CardContent className="py-10 text-center text-sm text-muted-foreground">
-            No goals yet. Set a weekly or monthly hour target for a subject.
+          <CardContent>
+            <EmptyState
+              icon={Target}
+              title="No goals yet"
+              description="Set a weekly or monthly hour target for a subject."
+              action={
+                <Button size="sm" onClick={() => setCreateOpen(true)}>
+                  Add goal
+                </Button>
+              }
+            />
           </CardContent>
         </Card>
       ) : (
