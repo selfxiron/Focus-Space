@@ -1,6 +1,8 @@
 @import "tailwindcss";
 @import "../lib/design-tokens.css";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -23,6 +25,7 @@
   --color-brand-dark: var(--brand-dark);
   --color-brand-muted: var(--brand-muted);
   --color-sidebar: var(--sidebar);
+  --color-elevated: var(--elevated);
   --color-pastel-peach: var(--pastel-peach);
   --color-pastel-mint: var(--pastel-mint);
   --color-pastel-lavender: var(--pastel-lavender);
@@ -42,4 +45,101 @@ body {
   color: var(--foreground);
   font-family: var(--font-plus-jakarta), ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: var(--brand-muted);
+  color: var(--foreground);
+}
+
+.fs-app-bg {
+  background:
+    radial-gradient(ellipse 90% 60% at 20% -10%, var(--brand-muted), transparent 55%),
+    radial-gradient(ellipse 50% 40% at 90% 10%, rgba(118, 228, 167, 0.04), transparent),
+    var(--background);
+}
+
+.fs-panel {
+  border: 1px solid var(--border);
+  background: var(--card);
+  box-shadow: var(--shadow-card);
+}
+
+.fs-glow-brand {
+  box-shadow: var(--shadow-glow);
+}
+
+.fs-icon-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  border: 1px solid var(--border-subtle);
+  background: var(--secondary);
+}
+
+.fs-metric {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.fs-metric-lg {
+  font-size: 2.75rem;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.fs-field {
+  display: flex;
+  height: 2.5rem;
+  width: 100%;
+  border-radius: var(--radius-button);
+  border: 1px solid var(--input);
+  background: var(--elevated);
+  padding: 0 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: var(--foreground);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.fs-field:focus-visible {
+  outline: none;
+  border-color: color-mix(in srgb, var(--brand) 50%, var(--input));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 20%, transparent);
+}
+
+.fs-field:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.fs-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--muted-foreground);
+}
+
+.fs-section-title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--foreground);
+}
+
+.fs-section-desc {
+  font-size: 0.8125rem;
+  color: var(--muted-foreground);
+}
+
+.fs-pill-active {
+  background: var(--brand-muted);
+  color: var(--brand);
+  border: 1px solid color-mix(in srgb, var(--brand) 25%, transparent);
 }

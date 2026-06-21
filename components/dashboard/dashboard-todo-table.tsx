@@ -15,7 +15,7 @@ export function DashboardTodoTable({ todos }: { todos: TodoWithSubject[] }) {
   const rows = todos.slice(0, 6);
 
   return (
-    <Card className="border-border/60 shadow-[var(--shadow-soft)]">
+    <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
           <CardTitle>Tasks & Sessions</CardTitle>

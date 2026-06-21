@@ -57,6 +57,11 @@ export type DashboardData = {
   chart7d: DashboardChartDay[];
   chart14d: DashboardChartDay[];
   todos: Awaited<ReturnType<typeof listTodos>>;
+  weeklyFocus: {
+    percent: number;
+    actualHours: number;
+    targetHours: number;
+  };
 };
 
 function formatTimeAgo(date: Date): string {
@@ -306,5 +311,10 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
     chart7d: hoursPerDayFromSlices(statsEntries, 7, now, settings.timezone),
     chart14d: hoursPerDayFromSlices(statsEntries, 14, now, settings.timezone),
     todos,
+    weeklyFocus: {
+      percent: goalPercent,
+      actualHours: goalActualHours,
+      targetHours: goalTargetHours,
+    },
   };
 }

@@ -100,7 +100,7 @@ export function GoalFormDialog({
                 id="goal-subject"
                 value={subjectId}
                 onChange={(e) => setSubjectId(e.target.value)}
-                className="flex h-10 w-full rounded-[12px] border border-input bg-card px-3 text-sm"
+                className="fs-field"
                 required
               >
                 {subjects.map((s) => (
@@ -128,7 +128,7 @@ export function GoalFormDialog({
                 id="goal-period"
                 value={period}
                 onChange={(e) => setPeriod(e.target.value as GoalPeriod)}
-                className="flex h-10 w-full rounded-[12px] border border-input bg-card px-3 text-sm"
+                className="fs-field"
               >
                 {GOAL_PERIODS.map((p) => (
                   <option key={p} value={p}>{PERIOD_LABELS[p]}</option>

@@ -229,7 +229,7 @@ export function NotesWorkspace({ notes, subjects }: NotesWorkspaceProps) {
           <select
             value={subjectFilter}
             onChange={(e) => setSubjectFilter(e.target.value)}
-            className="h-9 rounded-[12px] border border-input bg-card px-3 text-sm"
+            className="fs-field h-9"
           >
             <option value="all">All subjects</option>
             {subjects.map((s) => (
@@ -252,7 +252,7 @@ export function NotesWorkspace({ notes, subjects }: NotesWorkspaceProps) {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[280px_1fr]">
-        <Card className="border-border/60 shadow-[var(--shadow-card)]">
+        <Card>
           <CardContent className="p-2">
             {filteredNotes.length === 0 ? (
               <EmptyState
@@ -302,7 +302,7 @@ export function NotesWorkspace({ notes, subjects }: NotesWorkspaceProps) {
         </Card>
 
         {selectedId ? (
-          <Card className="border-border/60 shadow-[var(--shadow-soft)]">
+          <Card>
             <CardContent className="space-y-4 p-5">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="flex-1 space-y-4 min-w-0">
@@ -321,7 +321,7 @@ export function NotesWorkspace({ notes, subjects }: NotesWorkspaceProps) {
                       id="note-subject"
                       value={subjectId}
                       onChange={(e) => setSubjectId(e.target.value)}
-                      className="flex h-10 w-full rounded-[12px] border border-input bg-card px-3 text-sm"
+                      className="fs-field"
                     >
                       <option value="">None</option>
                       {subjects.map((s) => (
@@ -393,7 +393,7 @@ export function NotesWorkspace({ notes, subjects }: NotesWorkspaceProps) {
             </CardContent>
           </Card>
         ) : (
-          <Card className="border-border/60 shadow-[var(--shadow-card)]">
+          <Card>
             <CardContent className="flex min-h-[400px] items-center justify-center p-8 text-sm text-muted-foreground">
               Select a note or create a new one.
             </CardContent>

@@ -65,7 +65,7 @@ export async function completePomodoroWorkAction(input: {
 
   const { seconds } = elapsedBetween(startTime, endTime);
 
-  if (seconds < 60) {
+  if (seconds < 1) {
     throw new Error("Session too short to log");
   }
 

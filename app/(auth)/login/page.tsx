@@ -56,7 +56,7 @@ export default function LoginPage() {
   }
 
   return (
-    <Card className="border-border/60 shadow-[var(--shadow-soft)]">
+    <Card>
       <CardHeader className="text-center">
         <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-[14px] bg-brand-dark text-white">
           <span className="text-lg font-bold">FS</span>

@@ -93,7 +93,7 @@ export function TodoBoard({ todos, subjects }: TodoBoardProps) {
             onChange={(e) =>
               setStatusFilter(e.target.value as TodoStatus | "all")
             }
-            className="h-9 rounded-[12px] border border-input bg-card px-3 text-sm"
+            className="fs-field h-9"
           >
             <option value="all">All statuses</option>
             {TODO_STATUSES.map((s) => (
@@ -105,7 +105,7 @@ export function TodoBoard({ todos, subjects }: TodoBoardProps) {
             onChange={(e) =>
               setPriorityFilter(e.target.value as TodoPriority | "all")
             }
-            className="h-9 rounded-[12px] border border-input bg-card px-3 text-sm"
+            className="fs-field h-9"
           >
             <option value="all">All priorities</option>
             {TODO_PRIORITIES.map((p) => (
@@ -115,7 +115,7 @@ export function TodoBoard({ todos, subjects }: TodoBoardProps) {
           <select
             value={subjectFilter}
             onChange={(e) => setSubjectFilter(e.target.value)}
-            className="h-9 rounded-[12px] border border-input bg-card px-3 text-sm"
+            className="fs-field h-9"
           >
             <option value="all">All subjects</option>
             {subjects.map((s) => (
@@ -129,7 +129,7 @@ export function TodoBoard({ todos, subjects }: TodoBoardProps) {
         </Button>
       </div>
 
-      <Card className="border-border/60 shadow-[var(--shadow-soft)]">
+      <Card>
         <CardHeader>
           <CardTitle>Tasks</CardTitle>
           <p className="text-sm text-muted-foreground">

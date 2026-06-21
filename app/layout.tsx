@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 
+import { ThemeProvider } from "@/components/theme/theme-provider";
+
 import "./globals.css";
 
 const plusJakarta = Plus_Jakarta_Sans({
@@ -20,8 +22,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${plusJakarta.variable} antialiased`}>{children}</body>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${plusJakarta.variable} antialiased`}>
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
     </html>
   );
 }

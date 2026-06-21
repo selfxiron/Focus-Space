@@ -7,7 +7,9 @@ import { Coffee, Pause, Play, Timer, X } from "lucide-react";
 import { useTimer } from "@/components/tracker/timer-provider";
 import { useUserSettings } from "@/components/settings/settings-provider";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { NativeSelect } from "@/components/ui/native-select";
 import { completePomodoroWorkAction } from "@/lib/actions/pomodoro";
 import type { SubjectRow } from "@/lib/data/subjects";
 import { notifySessionLogged } from "@/lib/tracker/session-events";
@@ -68,11 +70,12 @@ export function PomodoroWidget({ subjects: initialSubjects }: { subjects: Subjec
       const pausedMs =
         pausedTotalMsRef.current +
         (pauseStartedRef.current ? Date.now() - pauseStartedRef.current : 0);
-      const focusedSeconds = Math.floor(
-        (Date.now() - startedAt.getTime() - pausedMs) / 1000
+      const focusedSeconds = Math.max(
+        0,
+        Math.floor((Date.now() - startedAt.getTime() - pausedMs) / 1000)
       );
 
-      if (!natural && focusedSeconds < 60) {
+      if (focusedSeconds < 1) {
         return;
       }
 
@@ -80,13 +83,17 @@ export function PomodoroWidget({ subjects: initialSubjects }: { subjects: Subjec
       setLogging(true);
       setError(null);
 
+      const endedAt = new Date(
+        startedAt.getTime() + focusedSeconds * 1000
+      ).toISOString();
+
       try {
         await completePomodoroWorkAction({
           subjectId,
           workMinutes,
           breakMinutes,
           startedAt: startedAt.toISOString(),
-          endedAt: new Date().toISOString(),
+          endedAt,
           recordPomodoroSession: natural,
         });
         notifySessionLogged();
@@ -191,7 +198,7 @@ export function PomodoroWidget({ subjects: initialSubjects }: { subjects: Subjec
       <button
         type="button"
         onClick={() => setExpanded(true)}
-        className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-brand-dark text-white shadow-[var(--shadow-soft)] transition-transform hover:scale-105"
+        className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-brand text-primary-foreground fs-glow-brand transition-all duration-200 hover:scale-105 hover:brightness-110 active:scale-95"
         aria-label="Open Pomodoro timer"
       >
         <Timer className="h-6 w-6" />
@@ -201,11 +208,11 @@ export function PomodoroWidget({ subjects: initialSubjects }: { subjects: Subjec
 
   return (
     <div
-      className="fixed bottom-6 right-6 z-40 w-[min(100vw-3rem,320px)] rounded-[20px] border border-border/60 bg-card p-5 shadow-[var(--shadow-soft)]"
+      className="fixed bottom-6 right-6 z-40 w-[min(100vw-3rem,320px)] fs-panel rounded-[var(--radius-card)] p-5 shadow-[var(--shadow-elevated)]"
     >
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Timer className="h-4 w-4 text-brand-dark" />
+          <Timer className="h-4 w-4 text-brand" />
           <span className="text-sm font-semibold">{phaseLabel}</span>
         </div>
         <Button
@@ -227,23 +234,23 @@ export function PomodoroWidget({ subjects: initialSubjects }: { subjects: Subjec
       {phase === "idle" ? (
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="pomodoro-subject">Subject</Label>
-            <select
+            <Label htmlFor="pomodoro-subject" className="fs-label">Subject</Label>
+            <NativeSelect
               id="pomodoro-subject"
               value={subjectId}
               onChange={(e) => setSubjectId(e.target.value)}
               disabled={subjects.length === 0}
-              className="flex h-10 w-full rounded-[12px] border border-input bg-card px-3 text-sm disabled:opacity-60"
+              className="disabled:opacity-60"
             >
               {subjects.map((s) => (
                 <option key={s.id} value={s.id}>{s.name}</option>
               ))}
-            </select>
+            </NativeSelect>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
-              <Label htmlFor="pomodoro-work">Work (min)</Label>
-              <input
+              <Label htmlFor="pomodoro-work" className="fs-label">Work (min)</Label>
+              <Input
                 id="pomodoro-work"
                 type="number"
                 min={1}
@@ -254,12 +261,11 @@ export function PomodoroWidget({ subjects: initialSubjects }: { subjects: Subjec
                     Number(e.target.value) || userSettings.pomodoroWorkMinutes
                   )
                 }
-                className="flex h-10 w-full rounded-[12px] border border-input bg-card px-3 text-sm"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="pomodoro-break">Break (min)</Label>
-              <input
+              <Label htmlFor="pomodoro-break" className="fs-label">Break (min)</Label>
+              <Input
                 id="pomodoro-break"
                 type="number"
                 min={0}
@@ -268,7 +274,6 @@ export function PomodoroWidget({ subjects: initialSubjects }: { subjects: Subjec
                 onChange={(e) =>
                   setBreakMinutes(Number(e.target.value) || 0)
                 }
-                className="flex h-10 w-full rounded-[12px] border border-input bg-card px-3 text-sm"
               />
             </div>
           </div>
@@ -282,7 +287,14 @@ export function PomodoroWidget({ subjects: initialSubjects }: { subjects: Subjec
           </Button>
         </div>
       ) : (
-        <div className="space-y-4 text-center">
+        <div
+          className={cn(
+            "space-y-4 rounded-[var(--radius-card)] border px-4 py-6 text-center",
+            phase === "work"
+              ? "border-brand/20 bg-elevated"
+              : "border-border bg-secondary/50"
+          )}
+        >
           <p
             className={cn(
               "text-4xl font-semibold tabular-nums tracking-tight",
@@ -293,7 +305,7 @@ export function PomodoroWidget({ subjects: initialSubjects }: { subjects: Subjec
           </p>
           <p className="text-sm text-muted-foreground">
             {phase === "work"
-              ? "Work time is logged to Session log when the focus block ends"
+              ? "Focused time is logged to Session log when you finish or stop"
               : "Take a short break"}
           </p>
           <div className="flex gap-2">

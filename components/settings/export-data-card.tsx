@@ -41,7 +41,7 @@ export function ExportDataCard() {
   }
 
   return (
-    <Card className="border-border/60 shadow-[var(--shadow-soft)]">
+    <Card>
       <CardHeader>
         <CardTitle>Export data</CardTitle>
         <CardDescription>

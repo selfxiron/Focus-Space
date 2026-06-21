@@ -9,7 +9,7 @@ export function SectionPlaceholder({
 }) {
   return (
     <div className="mx-auto max-w-[720px]">
-      <Card className="border-border/60 shadow-[var(--shadow-soft)]">
+      <Card>
         <CardHeader>
           <CardTitle>{title}</CardTitle>
           {description && (

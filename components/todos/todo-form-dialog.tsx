@@ -114,7 +114,7 @@ export function TodoFormDialog({
                 id="todo-priority"
                 value={priority}
                 onChange={(e) => setPriority(e.target.value as TodoPriority)}
-                className="flex h-10 w-full rounded-[12px] border border-input bg-card px-3 text-sm"
+                className="fs-field"
               >
                 {TODO_PRIORITIES.map((p) => (
                   <option key={p} value={p}>{PRIORITY_LABELS[p]}</option>
@@ -127,7 +127,7 @@ export function TodoFormDialog({
                 id="todo-status"
                 value={status}
                 onChange={(e) => setStatus(e.target.value as TodoStatus)}
-                className="flex h-10 w-full rounded-[12px] border border-input bg-card px-3 text-sm"
+                className="fs-field"
               >
                 {TODO_STATUSES.map((s) => (
                   <option key={s} value={s}>{STATUS_LABELS[s]}</option>
@@ -141,7 +141,7 @@ export function TodoFormDialog({
               id="todo-subject"
               value={subjectId}
               onChange={(e) => setSubjectId(e.target.value)}
-              className="flex h-10 w-full rounded-[12px] border border-input bg-card px-3 text-sm"
+              className="fs-field"
             >
               <option value="">None</option>
               {subjects.map((s) => (

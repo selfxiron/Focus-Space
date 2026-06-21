@@ -11,7 +11,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { NativeSelect } from "@/components/ui/native-select";
 import { updateUserSettingsAction } from "@/lib/actions/user-settings";
 import {
   TIMEZONE_OPTIONS,
@@ -56,7 +58,7 @@ export function PreferencesForm({ initialSettings }: PreferencesFormProps) {
   }
 
   return (
-    <Card className="border-border/60 shadow-[var(--shadow-soft)]">
+    <Card>
       <CardHeader>
         <CardTitle>Preferences</CardTitle>
         <CardDescription>
@@ -66,42 +68,39 @@ export function PreferencesForm({ initialSettings }: PreferencesFormProps) {
       </CardHeader>
       <CardContent className="space-y-5">
         <div className="space-y-2">
-          <Label htmlFor="settings-timezone">Timezone</Label>
-          <select
+          <Label htmlFor="settings-timezone" className="fs-label">Timezone</Label>
+          <NativeSelect
             id="settings-timezone"
             value={timezone}
             onChange={(e) => setTimezone(e.target.value)}
-            className="flex h-10 w-full rounded-[12px] border border-input bg-card px-3 text-sm"
           >
             {TIMEZONE_OPTIONS.map((zone) => (
               <option key={zone} value={zone}>{zone}</option>
             ))}
-          </select>
+          </NativeSelect>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="settings-work">Pomodoro work (min)</Label>
-            <input
+            <Label htmlFor="settings-work" className="fs-label">Pomodoro work (min)</Label>
+            <Input
               id="settings-work"
               type="number"
               min={1}
               max={120}
               value={workMinutes}
               onChange={(e) => setWorkMinutes(Number(e.target.value) || 1)}
-              className="flex h-10 w-full rounded-[12px] border border-input bg-card px-3 text-sm"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="settings-break">Pomodoro break (min)</Label>
-            <input
+            <Label htmlFor="settings-break" className="fs-label">Pomodoro break (min)</Label>
+            <Input
               id="settings-break"
               type="number"
               min={0}
               max={60}
               value={breakMinutes}
               onChange={(e) => setBreakMinutes(Number(e.target.value) || 0)}
-              className="flex h-10 w-full rounded-[12px] border border-input bg-card px-3 text-sm"
             />
           </div>
         </div>

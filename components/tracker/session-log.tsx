@@ -74,7 +74,7 @@ export function SessionLog({ entries }: SessionLogProps) {
   }
 
   return (
-    <Card className="border-border/60 shadow-[var(--shadow-soft)]">
+    <Card>
       <CardHeader>
         <CardTitle>Session log</CardTitle>
         <p className="text-sm text-muted-foreground">

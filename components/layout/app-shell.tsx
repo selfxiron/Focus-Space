@@ -31,11 +31,11 @@ export function AppShell({
   return (
     <TimerProvider initialActiveTimer={activeTimer}>
       <SettingsHydrator>
-        <div className="flex h-screen overflow-hidden bg-background">
+        <div className="flex h-screen overflow-hidden fs-app-bg">
           <Sidebar activePath={pathname} />
           <div className="flex flex-1 flex-col overflow-hidden">
             <Header userEmail={userEmail} userName={userName} />
-            <main className="flex-1 overflow-y-auto p-6 lg:p-8">{children}</main>
+            <main className="flex-1 overflow-y-auto p-5 lg:p-7">{children}</main>
           </div>
           <PomodoroWidget subjects={subjects} />
         </div>

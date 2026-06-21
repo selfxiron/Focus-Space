@@ -67,7 +67,7 @@ export function ManualEntryForm({ subjects }: ManualEntryFormProps) {
   }
 
   return (
-    <Card className="border-border/60 shadow-[var(--shadow-card)]">
+    <Card>
       <CardHeader>
         <CardTitle className="text-base">Manual entry</CardTitle>
       </CardHeader>
@@ -79,7 +79,7 @@ export function ManualEntryForm({ subjects }: ManualEntryFormProps) {
               id="manual-subject"
               value={subjectId}
               onChange={(e) => setSubjectId(e.target.value)}
-              className="flex h-10 w-full rounded-[12px] border border-input bg-card px-3 text-sm"
+              className="fs-field"
             >
               {subjects.map((s) => (
                 <option key={s.id} value={s.id}>{s.name}</option>

@@ -70,7 +70,7 @@ export function GoalsPanel({ goals, subjects }: GoalsPanelProps) {
       </div>
 
       {goals.length === 0 ? (
-        <Card className="border-border/60 shadow-[var(--shadow-card)]">
+        <Card>
           <CardContent>
             <EmptyState
               icon={Target}
@@ -91,13 +91,16 @@ export function GoalsPanel({ goals, subjects }: GoalsPanelProps) {
             return (
               <Card
                 key={goal.id}
-                className="border-border/60 shadow-[var(--shadow-card)]"
+                className="transition-shadow hover:shadow-[var(--shadow-soft)]"
               >
                 <CardHeader className="pb-2">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-2 min-w-0">
                       <div
-                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-secondary/80"
+                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-border/50 shadow-sm"
+                        style={{
+                          backgroundColor: `color-mix(in srgb, ${goal.subjectColor} 12%, var(--card))`,
+                        }}
                       >
                         <Icon
                           className="h-4 w-4"
@@ -137,7 +140,7 @@ export function GoalsPanel({ goals, subjects }: GoalsPanelProps) {
                 <CardContent className="flex items-center gap-4">
                   <GoalProgressRing
                     percent={goal.progressPercent}
-                    color={goal.subjectColor}
+                    color="var(--brand)"
                   />
                   <div>
                     <p className="text-lg font-semibold tabular-nums">

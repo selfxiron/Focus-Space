@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 export function SchemaSetupRequired() {
   return (
     <div className="mx-auto max-w-[720px]">
-      <Card className="border-border/60 shadow-[var(--shadow-soft)]">
+      <Card>
         <CardHeader>
           <CardTitle>Database setup required</CardTitle>
           <p className="text-sm text-muted-foreground">

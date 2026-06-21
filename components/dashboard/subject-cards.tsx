@@ -4,13 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import type { DashboardSubjectHours } from "@/lib/data/dashboard";
 import { getSubjectIcon } from "@/lib/subjects/constants";
-
-const BG_CYCLE = [
-  "bg-pastel-mint",
-  "bg-pastel-lavender",
-  "bg-pastel-peach",
-  "bg-pastel-sky",
-] as const;
+import { cn } from "@/lib/utils";
 
 export function SubjectCards({
   subjects,
@@ -29,22 +23,31 @@ export function SubjectCards({
 
   return (
     <div className="grid gap-4 sm:grid-cols-3">
-      {subjects.map((subject, index) => {
+      {subjects.map((subject) => {
         const Icon = getSubjectIcon(subject.icon);
         return (
           <Card
             key={subject.id}
-            className="border-border/60 shadow-[var(--shadow-card)] transition-shadow hover:shadow-[var(--shadow-soft)]"
+            className="transition-all duration-200 hover:border-border hover:shadow-[var(--shadow-soft)]"
           >
             <CardContent className="flex items-center gap-4 p-5">
               <div
-                className={`flex h-12 w-12 items-center justify-center rounded-[14px] ${BG_CYCLE[index % BG_CYCLE.length]}`}
+                className={cn(
+                  "flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border/50 shadow-sm"
+                )}
+                style={{
+                  backgroundColor: `color-mix(in srgb, ${subject.color} 12%, var(--card))`,
+                }}
               >
-                <Icon className="h-6 w-6" style={{ color: subject.color }} />
+                <Icon className="h-5 w-5" style={{ color: subject.color }} />
               </div>
-              <div>
-                <p className="text-sm font-medium">{subject.name}</p>
-                <p className="text-lg font-semibold">{subject.hours}</p>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-medium text-muted-foreground">
+                  {subject.name}
+                </p>
+                <p className="text-xl font-semibold tracking-tight tabular-nums">
+                  {subject.hours}
+                </p>
               </div>
             </CardContent>
           </Card>

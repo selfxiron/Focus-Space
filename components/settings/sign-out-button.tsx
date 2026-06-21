@@ -38,7 +38,7 @@ export function SignOutButton({ userEmail, userName }: SignOutButtonProps) {
   }
 
   return (
-    <Card className="border-border/60 shadow-[var(--shadow-soft)]">
+    <Card>
       <CardHeader>
         <CardTitle>Account</CardTitle>
         <CardDescription>

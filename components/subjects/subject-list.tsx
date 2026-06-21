@@ -84,11 +84,14 @@ export function SubjectList({ subjects }: SubjectListProps) {
           return (
             <Card
               key={subject.id}
-              className="border-border/60 shadow-[var(--shadow-card)]"
+              className="transition-all duration-200 hover:shadow-[var(--shadow-soft)]"
             >
               <CardContent className="flex items-center gap-4 p-5">
                 <div
-                  className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px] bg-secondary/80"
+                  className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-border/50 shadow-sm"
+                  style={{
+                    backgroundColor: `color-mix(in srgb, ${subject.color} 12%, var(--card))`,
+                  }}
                 >
                   <Icon
                     className="h-6 w-6"

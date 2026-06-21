@@ -11,7 +11,7 @@ export default function AppLayout({
   children: React.ReactNode;
 }) {
   return (
-    <Suspense fallback={<AppShellFrame>{children}</AppShellFrame>}>
+    <Suspense fallback={<AppShellFrame />}>
       <AppShellLoader>{children}</AppShellLoader>
     </Suspense>
   );
