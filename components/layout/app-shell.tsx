@@ -45,7 +45,8 @@ export function AppShell({
             <Header
               userEmail={userEmail}
               userName={userName}
-              onOpenMobileNav={() => setMobileNavOpen(true)}
+              mobileNavOpen={mobileNavOpen}
+              onToggleMobileNav={() => setMobileNavOpen((open) => !open)}
             />
             <main className="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-5 lg:p-7">
               {children}

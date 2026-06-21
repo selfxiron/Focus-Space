@@ -2,8 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, Search } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Menu, Search, X } from "lucide-react";
 
+import { easeOut } from "@/components/motion/motion-config";
+import { useReducedMotion } from "@/components/motion/use-reduced-motion";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ActiveTimerBadge } from "@/components/tracker/active-timer-badge";
@@ -40,15 +43,18 @@ const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
 interface HeaderProps {
   userEmail?: string | null;
   userName?: string | null;
-  onOpenMobileNav?: () => void;
+  mobileNavOpen?: boolean;
+  onToggleMobileNav?: () => void;
 }
 
 export function Header({
   userEmail,
   userName,
-  onOpenMobileNav,
+  mobileNavOpen = false,
+  onToggleMobileNav,
 }: HeaderProps) {
   const pathname = usePathname();
+  const reducedMotion = useReducedMotion();
   const page = PAGE_TITLES[pathname] ?? PAGE_TITLES["/"];
   const displayName = userName ?? userEmail?.split("@")[0] ?? "User";
   const initials = displayName.slice(0, 2).toUpperCase();
@@ -61,10 +67,41 @@ export function Header({
           variant="ghost"
           size="icon"
           className="h-9 w-9 shrink-0 lg:hidden"
-          onClick={() => onOpenMobileNav?.()}
-          aria-label="Open navigation menu"
+          onClick={() => onToggleMobileNav?.()}
+          aria-label={
+            mobileNavOpen ? "Close navigation menu" : "Open navigation menu"
+          }
+          aria-expanded={mobileNavOpen}
         >
-          <Menu className="h-5 w-5" />
+          <AnimatePresence mode="wait" initial={false}>
+            {mobileNavOpen ? (
+              <motion.span
+                key="close"
+                className="flex items-center justify-center"
+                initial={reducedMotion ? false : { rotate: -90, opacity: 0 }}
+                animate={{ rotate: 0, opacity: 1 }}
+                exit={
+                  reducedMotion ? undefined : { rotate: 90, opacity: 0 }
+                }
+                transition={{ duration: 0.2, ease: easeOut }}
+              >
+                <X className="h-5 w-5" />
+              </motion.span>
+            ) : (
+              <motion.span
+                key="menu"
+                className="flex items-center justify-center"
+                initial={reducedMotion ? false : { rotate: 90, opacity: 0 }}
+                animate={{ rotate: 0, opacity: 1 }}
+                exit={
+                  reducedMotion ? undefined : { rotate: -90, opacity: 0 }
+                }
+                transition={{ duration: 0.2, ease: easeOut }}
+              >
+                <Menu className="h-5 w-5" />
+              </motion.span>
+            )}
+          </AnimatePresence>
         </Button>
         <div className="min-w-0">
           <h1 className="truncate text-sm font-bold tracking-tight text-foreground sm:text-base">
