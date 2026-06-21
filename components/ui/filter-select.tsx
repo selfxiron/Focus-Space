@@ -32,8 +32,16 @@ export function FilterSelect({
   size?: "sm" | "default";
   fullWidth?: boolean;
 }) {
+  const selectedValue = options.some((option) => option.value === value)
+    ? value
+    : undefined;
+
   return (
-    <Select value={value} onValueChange={onValueChange} disabled={disabled}>
+    <Select
+      value={selectedValue}
+      onValueChange={onValueChange}
+      disabled={disabled || options.length === 0}
+    >
       <SelectTrigger
         id={id}
         aria-label={ariaLabel}

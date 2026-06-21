@@ -258,9 +258,9 @@ export function NotesWorkspace({ notes, subjects }: NotesWorkspaceProps) {
         </Button>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-[280px_1fr]">
-        <Card>
-          <CardContent className="p-2">
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,280px)_1fr]">
+        <Card className="max-h-[42vh] overflow-hidden lg:max-h-none">
+          <CardContent className="max-h-[inherit] overflow-y-auto p-2">
             {filteredNotes.length === 0 ? (
               <EmptyState
                 icon={FilePlus}

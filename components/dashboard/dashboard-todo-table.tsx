@@ -16,7 +16,7 @@ export function DashboardTodoTable({ todos }: { todos: TodoWithSubject[] }) {
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
+      <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <CardTitle>Tasks & Sessions</CardTitle>
           <p className="text-sm text-muted-foreground">
@@ -39,7 +39,8 @@ export function DashboardTodoTable({ todos }: { todos: TodoWithSubject[] }) {
             </Link>
           </p>
         ) : (
-          <div className="overflow-hidden rounded-[14px] border border-border/60">
+          <div className="-mx-1 overflow-x-auto sm:mx-0">
+            <div className="min-w-[480px] overflow-hidden rounded-[14px] border border-border/60 sm:min-w-0">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border/60 bg-secondary/50 text-left">
@@ -79,6 +80,7 @@ export function DashboardTodoTable({ todos }: { todos: TodoWithSubject[] }) {
                 ))}
               </tbody>
             </table>
+            </div>
           </div>
         )}
       </CardContent>

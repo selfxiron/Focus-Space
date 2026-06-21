@@ -227,7 +227,7 @@ export function PomodoroWidget({ subjects: initialSubjects }: { subjects: Subjec
           transition={springSnappy}
           whileHover={{ scale: 1.06 }}
           whileTap={{ scale: 0.94 }}
-          className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-brand text-primary-foreground fs-glow-brand"
+          className="fixed bottom-4 right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-brand text-primary-foreground fs-glow-brand sm:bottom-6 sm:right-6 max-sm:mb-[env(safe-area-inset-bottom)]"
           aria-label="Open Pomodoro timer"
         >
           {isRunning && (
@@ -251,7 +251,7 @@ export function PomodoroWidget({ subjects: initialSubjects }: { subjects: Subjec
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 16, scale: 0.96 }}
           transition={springSnappy}
-          className="fixed bottom-6 right-6 z-40 w-[min(100vw-3rem,320px)] fs-panel rounded-[var(--radius-card)] p-5 shadow-[var(--shadow-elevated)]"
+          className="fixed bottom-4 right-4 z-40 w-[min(100vw-2rem,320px)] fs-panel rounded-[var(--radius-card)] p-4 shadow-[var(--shadow-elevated)] sm:bottom-6 sm:right-6 sm:p-5 max-sm:mb-[env(safe-area-inset-bottom)]"
         >
           <div className="mb-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -289,17 +289,22 @@ export function PomodoroWidget({ subjects: initialSubjects }: { subjects: Subjec
               >
                 <div className="space-y-2">
                   <Label htmlFor="pomodoro-subject" className="fs-label">Subject</Label>
-                  <FilterSelect
-                    id="pomodoro-subject"
-                    value={subjectId}
-                    onValueChange={setSubjectId}
-                    disabled={subjects.length === 0}
-                    options={subjects.map((s) => ({
-                      value: s.id,
-                      label: s.name,
-                    }))}
-                    fullWidth
-                  />
+                  {subjects.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">
+                      Add a subject on the Subjects page first.
+                    </p>
+                  ) : (
+                    <FilterSelect
+                      id="pomodoro-subject"
+                      value={subjectId}
+                      onValueChange={setSubjectId}
+                      options={subjects.map((s) => ({
+                        value: s.id,
+                        label: s.name,
+                      }))}
+                      fullWidth
+                    />
+                  )}
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-2">

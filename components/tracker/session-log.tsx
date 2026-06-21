@@ -90,7 +90,8 @@ export function SessionLog({ entries }: SessionLogProps) {
             description="Start the timer, use Pomodoro, or add a manual entry above."
           />
         ) : (
-          <div className="overflow-hidden rounded-[14px] border border-border/60">
+          <div className="-mx-1 overflow-x-auto sm:mx-0">
+            <div className="min-w-[640px] overflow-hidden rounded-[14px] border border-border/60 sm:min-w-0">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border/60 bg-secondary/50 text-left">
@@ -161,6 +162,7 @@ export function SessionLog({ entries }: SessionLogProps) {
                 })}
               </tbody>
             </table>
+            </div>
           </div>
         )}
       </CardContent>

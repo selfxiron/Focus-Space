@@ -51,7 +51,7 @@ export function GoalsPanel({ goals, subjects }: GoalsPanelProps) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-base font-semibold">Study goals</h2>
           <p className="text-sm text-muted-foreground">

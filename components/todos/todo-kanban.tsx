@@ -61,7 +61,7 @@ export function TodoKanban({ todos, onEdit, onRefresh }: TodoKanbanProps) {
   }
 
   return (
-    <div className="grid gap-4 lg:grid-cols-3">
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       {TODO_STATUSES.map((status) => {
         const columnTodos = todos.filter((t) => t.status === status);
         return (

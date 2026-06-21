@@ -16,6 +16,12 @@ export const metadata: Metadata = {
   description: "Self-hosted study tracker for hours, tasks, notes, and goals",
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover" as const,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{

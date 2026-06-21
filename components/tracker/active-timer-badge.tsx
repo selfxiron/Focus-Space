@@ -11,9 +11,9 @@ export function ActiveTimerBadge() {
 
   if (!activeTimer) {
     return (
-      <Badge variant="outline" className="gap-1.5 px-3 py-1.5 text-muted-foreground">
+      <Badge variant="outline" className="gap-1.5 px-2 py-1.5 text-muted-foreground sm:px-3">
         <Timer className="h-3 w-3" />
-        No timer
+        <span className="hidden sm:inline">No timer</span>
       </Badge>
     );
   }
@@ -28,7 +28,11 @@ export function ActiveTimerBadge() {
           />
           <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-dark" />
         </span>
-        {activeTimer.subjectName} · {elapsedLabel}
+        <span className="hidden max-w-[5rem] truncate sm:inline sm:max-w-[8rem]">
+          {activeTimer.subjectName}
+        </span>
+        <span className="hidden sm:inline">·</span>
+        <span className="tabular-nums">{elapsedLabel}</span>
       </Badge>
     </Link>
   );

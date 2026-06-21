@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { usePathname } from "next/navigation";
 
 import { Header } from "@/components/layout/header";
+import { MobileNav } from "@/components/layout/mobile-nav";
 import { Sidebar } from "@/components/layout/sidebar";
 import { CommandPalette } from "@/components/command/command-palette";
 import { PomodoroWidget } from "@/components/pomodoro/pomodoro-widget";
@@ -27,15 +29,27 @@ export function AppShell({
   subjects,
 }: AppShellProps) {
   const pathname = usePathname();
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   return (
     <TimerProvider initialActiveTimer={activeTimer}>
       <SettingsHydrator>
-        <div className="flex h-screen overflow-hidden fs-app-bg">
+        <div className="flex h-[100dvh] overflow-hidden fs-app-bg">
           <Sidebar activePath={pathname} />
-          <div className="flex flex-1 flex-col overflow-hidden">
-            <Header userEmail={userEmail} userName={userName} />
-            <main className="flex-1 overflow-y-auto p-5 lg:p-7">{children}</main>
+          <MobileNav
+            open={mobileNavOpen}
+            onOpenChange={setMobileNavOpen}
+            activePath={pathname}
+          />
+          <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+            <Header
+              userEmail={userEmail}
+              userName={userName}
+              onOpenMobileNav={() => setMobileNavOpen(true)}
+            />
+            <main className="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-5 lg:p-7">
+              {children}
+            </main>
           </div>
           <PomodoroWidget subjects={subjects} />
         </div>

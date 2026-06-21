@@ -32,7 +32,7 @@ export function WeeklyChart({ chart7d, chart14d }: WeeklyChartProps) {
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
+      <CardHeader className="flex flex-col gap-3 pb-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <CardTitle>Study intensity</CardTitle>
           <p className="mt-1 text-xs text-muted-foreground">Hours per day</p>
